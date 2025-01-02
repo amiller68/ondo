@@ -1,0 +1,19 @@
+<main class="font-roboto-mono">
+    <div class="max-w-3xl mx-auto px-4 py-4">
+        <div class="relative">
+            <h1 class="relative w-[max-content] text-4xl mb-16 before:absolute before:inset-0 before:w-full before:animate-typewriter before:bg-white after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-black">
+                > blog stuff
+            </h1>
+        </div>
+        
+        <div id="blog-posts"
+             hx-get="/blog/api/posts"
+             hx-trigger="load">
+            <div class="flex justify-center items-center py-12">
+                <div id="spinner" class="htmx-indicator">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

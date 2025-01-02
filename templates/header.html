@@ -1,0 +1,96 @@
+<header>
+  <dialog id="menu-dialog">
+    <div class="menu">
+      <nav>
+          <ul>
+              <li><a href="/" 
+                     hx-get="/" 
+                     hx-target="#content"
+                     hx-push-url="true">home</a></li>
+              <li><a href="/about" 
+                     hx-get="/about" 
+                     hx-target="#content"
+                     hx-push-url="true">about</a></li>
+              <li><a href="/gallery" 
+                     hx-get="/gallery" 
+                     hx-target="#content"
+                     hx-push-url="true">gallery</a></li>
+              <li><a href="/blog" 
+                     hx-get="/blog" 
+                     hx-target="#content"
+                     hx-push-url="true">blog</a></li>
+          </ul>
+      </nav>
+      <span id="menu-close">
+        <p>> X</p>
+      </span>
+    </div>
+  </dialog>
+
+  <div class="container mx-auto flex justify-between items-center h-[4rem]">
+    <span id="banner">
+      <a href="/" 
+         hx-get="/" 
+         hx-target="#content"
+         hx-push-url="true">Krondor</a>
+    </span>
+    <div class="flex items-center">
+      <input type="checkbox" id="menu-toggle" class="hidden"/>
+      <label for="menu-toggle" class="cursor-pointer p-4">
+        <div id="menu-icon" class="w-8 h-6 relative">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuDialog = document.getElementById('menu-dialog');
+      const menuToggle = document.getElementById('menu-toggle');
+      const menuClose = document.getElementById('menu-close');
+      
+      function toggleMenu(open = null) {
+        const isOpen = open !== null ? open : !menuDialog.open;
+        menuDialog.open = isOpen;
+        menuToggle.checked = isOpen;
+        
+        // Toggle body scroll
+        if (isOpen) {
+          document.body.classList.add('body-no-scroll');
+        } else {
+          document.body.classList.remove('body-no-scroll');
+        }
+      }
+
+      // Add handler for menu links to close menu after navigation
+      menuDialog.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          toggleMenu(false);
+        });
+      });
+
+      // Toggle menu when checkbox is clicked
+      menuToggle.addEventListener('click', () => toggleMenu());
+
+      // Close menu when clicking X button
+      menuClose.addEventListener('click', () => toggleMenu(false));
+
+      // Close menu when clicking outside
+      menuDialog.addEventListener('click', function(event) {
+        if (event.target === menuDialog) {
+          toggleMenu(false);
+        }
+      });
+
+      // Close menu when escape key is pressed
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && menuDialog.open) {
+          toggleMenu(false);
+        }
+      });
+    });
+  </script>
+</header>

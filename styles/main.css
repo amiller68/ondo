@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .font-roboto-mono {
+    font-family: "Roboto Mono", monospace;
+  }
+  .font-vt323 {
+    font-family: "VT323", monospace;
+  }
+}
+
+@layer base {
+  html,
+  body {
+    @apply w-full h-full bg-white text-black;
+  }
+}
+
+/* App Level Styles */
+
+header {
+  @apply flex flex-col font-vt323 w-full fixed top-0 z-10 px-4 py-4;
+  #banner {
+    @apply text-6xl;
+    :hover {
+      @apply scale-110;
+    }
+  }
+}
+
+label {
+  @apply text-sm cursor-pointer mx-4 transition-transform duration-300;
+  &:hover {
+    @apply scale-110;
+  }
+}
+
+dialog {
+  @apply inset-0 h-screen w-screen text-2xl py-4 px-6 bg-black bg-opacity-20 fixed;
+  z-index: 999;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.body-no-scroll {
+  @apply overflow-hidden;
+}
+
+.menu {
+  left: 15%;
+  top: 15%;
+  @apply relative m-4 w-[70%] rounded-lg shadow-xl bg-white border-2 border-black;
+  
+  ul {
+    @apply flex flex-col gap-2 p-4 items-center;
+    
+    li {
+      @apply transition-transform duration-300;
+      
+      &:hover {
+        @apply scale-110;
+      }
+    }
+  }
+  
+  #menu-close {
+    @apply flex flex-col absolute top-2 right-2 cursor-pointer transition-transform duration-300;
+    
+    &:hover {
+      @apply scale-110;
+    }
+  }
+}
+
+/* Main Page Content */
+main {
+  @apply font-roboto-mono px-4 py-4 mt-[4rem];
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* menu icon */
+.hamburger-line {
+  @apply absolute w-full h-[2px] bg-black transition-all duration-300 transform;
+}
+
+#menu-icon {
+  @apply relative;
+}
+
+#menu-toggle:checked ~ label #menu-icon .hamburger-line:nth-child(1) {
+  @apply top-1/2 -translate-y-1/2 rotate-45;
+}
+
+#menu-toggle:checked ~ label #menu-icon .hamburger-line:nth-child(2) {
+  @apply opacity-0;
+}
+
+#menu-toggle:checked ~ label #menu-icon .hamburger-line:nth-child(3) {
+  @apply bottom-1/2 translate-y-1/2 -rotate-45;
+}
+
+/* initial state of menu icon */
+#menu-icon .hamburger-line:nth-child(1) {
+  @apply top-0;
+}
+
+#menu-icon .hamburger-line:nth-child(2) {
+  @apply top-1/2 -translate-y-1/2;
+}
+
+#menu-icon .hamburger-line:nth-child(3) {
+  @apply bottom-0;
+}
+
+/* Add this to your existing CSS */
+.htmx-indicator {
+  @apply hidden;
+}
+
+.htmx-request .htmx-indicator {
+  @apply inline-block;
+}
+
+/* Optional: if you want to fade the content during loading */
+.htmx-request #content {
+  @apply opacity-50 transition-opacity duration-300;
+}
+
+/* Add this new spinner style */
+.spinner {
+  @apply h-24 w-24 border-[8px] border-gray-200 border-t-gray-400 rounded-full animate-spin;
+}

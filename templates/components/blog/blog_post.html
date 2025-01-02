@@ -1,0 +1,20 @@
+<article class="bg-white rounded-lg border-2 border-black shadow-xl p-6">
+    <h1 class="font-vt323 text-2xl mb-4">{{ title }}</h1>
+    <p class="text-gray-600 mb-2">{{ description }}</p>
+    <p class="text-sm text-gray-500 mb-8">{{ date }}</p>
+    <div class="prose prose-slate max-w-none mt-8
+               [&>p]:mb-4 [&>p]:text-base
+               [&>h2]:font-vt323 [&>h2]:text-2xl [&>h2]:mt-8 [&>h2]:mb-4
+               [&>h3]:font-vt323 [&>h3]:text-xl [&>h3]:mt-6 [&>h3]:mb-3
+               [&>pre]:bg-gray-100 [&>pre]:p-4 [&>pre]:rounded-md [&>pre]:overflow-x-auto
+               [&>pre]:my-4 [&>pre]:text-sm [&>pre]:font-roboto-mono
+               [&>:not(pre)>code]:bg-gray-100 [&>:not(pre)>code]:text-sm [&>:not(pre)>code]:font-roboto-mono
+               [&>:not(pre)>code]:px-1 [&>:not(pre)>code]:py-0.5 [&>:not(pre)>code]:rounded
+               [&>sup]:text-xs [&>sup]:ml-0.5
+               [&>hr]:my-8 [&>hr]:border-gray-300
+               [&>.footnote-definition]:my-16 [&>.footnote-definition]:grid [&>.footnote-definition]:grid-cols-[2em_1fr] [&>.footnote-definition]:gap-2
+               [&>.footnote-definition>p]:m-0 [&>.footnote-definition>p]:col-start-2
+               [&>.footnote-definition>.footnote-definition-label]:col-start-1">
+        {{ content | safe }}
+    </div>
+</article>

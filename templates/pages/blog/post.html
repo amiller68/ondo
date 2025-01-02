@@ -1,0 +1,26 @@
+<main class="font-roboto-mono">
+    <div class="max-w-3xl mx-auto px-4 pt-4">
+        <a href="/blog"
+           hx-get="/blog"
+           hx-target="#content"
+           hx-push-url="true"
+           class="inline-block hover:translate-x-[-4px] transition-transform">
+            ← back to posts
+        </a>
+    </div>
+    <div class="max-w-3xl mx-auto px-4 py-4"
+         hx-get="/blog/api/posts/{{ name }}"
+         hx-trigger="load"
+         hx-swap="innerHTML"
+         hx-on::after-request="
+            if(event.detail.failed) {
+                this.innerHTML = event.detail.xhr.response;
+            }
+         ">
+        <div class="flex justify-center items-center py-12">
+            <div id="spinner" class="htmx-indicator">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+</main> 

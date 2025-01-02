@@ -1,0 +1,11 @@
+<div class="max-w-3xl mx-auto px-4 py-4">
+    <div class="bg-white rounded-lg border-2 border-black shadow-xl">
+        <img src="{{ image.get_url() }}" 
+             alt="{{ image.name }}" 
+             class="w-full object-contain max-h-[70vh]"/>
+        <div class="p-6">
+            <h1 class="font-vt323 text-2xl mb-2">{{ image.name }}</h1>
+            <p class="text-sm text-gray-500">{{ image.created_at.strftime('%Y-%m-%d') }}</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+python-dotenv
+pydantic
+fastapi
+starlette
+uvicorn
+jinja2
+greenlet
+tenacity
+watchfiles
+sse-starlette
+
+# Dev dependencies
+pytailwindcss
+pytest
+pytest-asyncio
+black
+ruff
+mypy
+pre-commit

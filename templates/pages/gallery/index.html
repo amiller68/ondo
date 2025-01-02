@@ -1,0 +1,14 @@
+<main class="font-roboto-mono">
+    <div class="max-w-3xl mx-auto px-4 py-4">
+        <div class="relative">
+            <h1 class="relative w-[max-content] text-4xl mb-16 before:absolute before:inset-0 before:w-full before:animate-typewriter before:bg-white after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-black">
+                > doodles and pics
+            </h1>
+        </div>
+
+        <div id="gallery-items"
+             hx-get="/gallery/api/items"
+             hx-trigger="load">
+        </div>
+    </div>
+</main>
