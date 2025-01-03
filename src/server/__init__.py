@@ -109,4 +109,3 @@ def create_app(state: AppState) -> FastAPI:
 
 # This instance is used by uvicorn
 app = None
-
