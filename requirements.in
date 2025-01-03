@@ -8,6 +8,7 @@ greenlet
 tenacity
 watchfiles
 sse-starlette
+httpx
 
 # Dev dependencies
 pytailwindcss

@@ -8,6 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     virtualenv \
+    python3-pip-whl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the bin scripts
