@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     gcc \
     virtualenv \
     python3-pip-whl \
+    python3-setuptools-whl \
+    python3-wheel-whl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the bin scripts
