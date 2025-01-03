@@ -99,8 +99,14 @@ def create_app(state: AppState) -> FastAPI:
     app.include_router(html_router)
     app.include_router(status_router, prefix="/_status")
 
+    # and respond 200 to /up to please kamal
+    @app.get("/up")
+    async def up():
+        return "OK"
+
     return app
 
 
 # This instance is used by uvicorn
 app = None
+

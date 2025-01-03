@@ -41,7 +41,7 @@ RUN echo '#!/bin/bash' > /app/start.sh && \
     chmod +x /app/start.sh
 
 # Expose the port the app runs on
-EXPOSE 8000
+EXPOSE 80
 
 # Set the entrypoint to our startup script
 ENTRYPOINT ["/app/start.sh"]
