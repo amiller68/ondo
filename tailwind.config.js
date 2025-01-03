@@ -67,7 +67,15 @@ module.exports = {
       rotate: {
         '45': '45deg',
         '-45': '-45deg',
-      }
+      },
+      height: {
+        'screen': '100vh',
+        'screen-small': '-webkit-fill-available', // For iOS Safari
+      },
+      minHeight: {
+        'screen': '100vh',
+        'screen-small': '-webkit-fill-available', // For iOS Safari
+      },
     },
   },
   plugins: []

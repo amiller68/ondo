@@ -14,7 +14,9 @@
 @layer base {
   html,
   body {
-    @apply w-full h-full bg-white text-black;
+    @apply w-full h-full bg-white text-black overflow-x-hidden;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -40,7 +42,6 @@ label {
 dialog {
   @apply inset-0 h-screen w-screen text-2xl py-4 px-6 bg-black bg-opacity-20 fixed;
   z-index: 999;
-  overflow: hidden;
   touch-action: none;
 }
 
@@ -77,8 +78,9 @@ dialog {
 /* Main Page Content */
 main {
   @apply font-roboto-mono px-4 py-4 mt-[4rem];
-  overflow: hidden;
-  touch-action: none;
+  overflow-y: auto;
+  touch-action: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* menu icon */
