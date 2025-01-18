@@ -193,3 +193,81 @@ class GalleryImage(BaseModel):
                 return None
 
             return cls(name=name, created_at=created_at, base_url=base_url)
+
+
+class AudioTrack(BaseModel):
+    name: str
+    created_at: datetime
+    base_url: str = Field(exclude=True)
+
+    def get_url(self) -> str:
+        """Get the URL for the audio track"""
+        return f"{self.base_url}/audio/{self.name}"
+
+    @classmethod
+    async def read_all(cls, base_url: str) -> List["AudioTrack"]:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{base_url}/audio")
+
+            if response.status_code != 200:
+                return []
+
+            items = response.json()
+            tracks = []
+
+            for item in items:
+                try:
+                    if not (isinstance(item, list) and len(item) > 1):
+                        continue
+
+                    name = item[0]
+                    data = item[1][1]
+
+                    if not (isinstance(data, dict) and "created_at" in data):
+                        continue
+
+                    created_at = parse_date(data["created_at"])
+                    if created_at is None:
+                        continue
+
+                    tracks.append(
+                        cls(name=name, created_at=created_at, base_url=base_url)
+                    )
+                except (IndexError, KeyError, ValueError):
+                    continue
+
+            return sorted(tracks, key=lambda x: x.created_at, reverse=True)
+
+    @classmethod
+    async def read_one(cls, base_url: str, name: str) -> Optional["AudioTrack"]:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{base_url}/audio")
+            if response.status_code != 200:
+                return None
+
+            items = response.json()
+            track_item = next(
+                (
+                    item
+                    for item in items
+                    if isinstance(item, list) and len(item) > 0 and item[0] == name
+                ),
+                None,
+            )
+
+            if not track_item or not (
+                len(track_item) > 1
+                and isinstance(track_item[1], list)
+                and len(track_item[1]) > 1
+                and track_item[1][1]
+                and isinstance(track_item[1][1], dict)
+                and "created_at" in track_item[1][1]
+            ):
+                return None
+
+            data = track_item[1][1]
+            created_at = parse_date(data["created_at"])
+            if created_at is None:
+                return None
+
+            return cls(name=name, created_at=created_at, base_url=base_url)
