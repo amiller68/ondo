@@ -8,14 +8,9 @@ def parse_date(date_value: Any) -> Optional[datetime]:
     if isinstance(date_value, list) and len(date_value) >= 9:
         try:
             # New format has [year, month, day, hour, minute, second, microsecond, _, _]
-            return datetime(
-                year=date_value[0],
-                month=date_value[1],
-                day=date_value[2],
-                hour=date_value[3],
-                minute=date_value[4],
-                second=date_value[5],
-                microsecond=date_value[6]
+            return datetime.strptime(
+                f"{date_value[0]} {date_value[1]}",
+                "%Y %j",
             )
         except (ValueError, IndexError):
             return None
@@ -52,6 +47,8 @@ class BlogPost(BaseModel):
             items = response.json()
             posts = []
 
+            print(items)
+
             for item in items:
                 try:
                     if not isinstance(item, dict) or item.get("is_dir", True):
@@ -59,6 +56,7 @@ class BlogPost(BaseModel):
 
                     name = item["path"]
                     data = item.get("object", {})
+
 
                     if not data or "properties" not in data or "created_at" not in data:
                         continue
@@ -90,7 +88,11 @@ class BlogPost(BaseModel):
 
             items = meta_response.json()
             post_item = next(
-                (item for item in items if not item.get("is_dir") and item["path"] == name),
+                (
+                    item
+                    for item in items
+                    if not item.get("is_dir") and item["path"] == name
+                ),
                 None,
             )
 
@@ -161,7 +163,7 @@ class GalleryImage(BaseModel):
                             name=name,
                             created_at=created_at,
                             cid=item["cid"],
-                            base_url=base_url
+                            base_url=base_url,
                         )
                     )
                 except (KeyError, ValueError):
@@ -178,7 +180,11 @@ class GalleryImage(BaseModel):
 
             items = response.json()
             image_item = next(
-                (item for item in items if not item.get("is_dir") and item["path"] == name),
+                (
+                    item
+                    for item in items
+                    if not item.get("is_dir") and item["path"] == name
+                ),
                 None,
             )
 
@@ -197,7 +203,7 @@ class GalleryImage(BaseModel):
                 name=name,
                 created_at=created_at,
                 cid=image_item["cid"],
-                base_url=base_url
+                base_url=base_url,
             )
 
 
@@ -242,7 +248,7 @@ class AudioTrack(BaseModel):
                             name=name,
                             created_at=created_at,
                             cid=item["cid"],
-                            base_url=base_url
+                            base_url=base_url,
                         )
                     )
                 except (KeyError, ValueError):
@@ -259,7 +265,11 @@ class AudioTrack(BaseModel):
 
             items = response.json()
             track_item = next(
-                (item for item in items if not item.get("is_dir") and item["path"] == name),
+                (
+                    item
+                    for item in items
+                    if not item.get("is_dir") and item["path"] == name
+                ),
                 None,
             )
 
@@ -278,5 +288,5 @@ class AudioTrack(BaseModel):
                 name=name,
                 created_at=created_at,
                 cid=track_item["cid"],
-                base_url=base_url
+                base_url=base_url,
             )
