@@ -5,12 +5,28 @@ import httpx
 
 
 def parse_date(date_value: Any) -> Optional[datetime]:
-    if isinstance(date_value, list) and len(date_value) >= 2:
+    if isinstance(date_value, list) and len(date_value) >= 9:
         try:
-            return datetime.strptime(f"{date_value[0]} {date_value[1]}", "%Y %j")
+            # New format has [year, month, day, hour, minute, second, microsecond, _, _]
+            return datetime(
+                year=date_value[0],
+                month=date_value[1],
+                day=date_value[2],
+                hour=date_value[3],
+                minute=date_value[4],
+                second=date_value[5],
+                microsecond=date_value[6]
+            )
         except (ValueError, IndexError):
             return None
     return None
+
+
+class FileObject(BaseModel):
+    cid: str
+    path: str
+    is_dir: bool
+    object: Optional[dict]
 
 
 class BlogPostMetadata(BaseModel):
@@ -38,17 +54,13 @@ class BlogPost(BaseModel):
 
             for item in items:
                 try:
-                    if not (isinstance(item, list) and len(item) > 1):
+                    if not isinstance(item, dict) or item.get("is_dir", True):
                         continue
 
-                    name = item[0]
-                    data = item[1][1]
+                    name = item["path"]
+                    data = item.get("object", {})
 
-                    if not (
-                        isinstance(data, dict)
-                        and "metadata" in data
-                        and "created_at" in data
-                    ):
+                    if not data or "properties" not in data or "created_at" not in data:
                         continue
 
                     created_at = parse_date(data["created_at"])
@@ -58,12 +70,12 @@ class BlogPost(BaseModel):
                     posts.append(
                         cls(
                             name=name,
-                            title=data["metadata"]["title"],
-                            description=data["metadata"]["description"],
+                            title=data["properties"]["title"],
+                            description=data["properties"]["description"],
                             created_at=created_at,
                         )
                     )
-                except (IndexError, KeyError, ValueError):
+                except (KeyError, ValueError):
                     continue
 
             return sorted(posts, key=lambda x: x.created_at, reverse=True)
@@ -78,26 +90,17 @@ class BlogPost(BaseModel):
 
             items = meta_response.json()
             post_item = next(
-                (
-                    item
-                    for item in items
-                    if isinstance(item, list) and len(item) > 0 and item[0] == name
-                ),
+                (item for item in items if not item.get("is_dir") and item["path"] == name),
                 None,
             )
 
-            if not post_item or not (
-                len(post_item) > 1
-                and isinstance(post_item[1], list)
-                and len(post_item[1]) > 1
-                and post_item[1][1]
-                and isinstance(post_item[1][1], dict)
-                and "metadata" in post_item[1][1]
-                and "created_at" in post_item[1][1]
-            ):
+            if not post_item or not post_item.get("object"):
                 return None
 
-            data = post_item[1][1]
+            data = post_item["object"]
+            if "properties" not in data or "created_at" not in data:
+                return None
+
             created_at = parse_date(data["created_at"])
             if created_at is None:
                 return None
@@ -109,8 +112,8 @@ class BlogPost(BaseModel):
 
             return cls(
                 name=name,
-                title=data["metadata"]["title"],
-                description=data["metadata"]["description"],
+                title=data["properties"]["title"],
+                description=data["properties"]["description"],
                 created_at=created_at,
                 content=content_response.text,
             )
@@ -119,7 +122,8 @@ class BlogPost(BaseModel):
 class GalleryImage(BaseModel):
     name: str
     created_at: datetime
-    base_url: str = Field(exclude=True)  # Add base_url but exclude from serialization
+    cid: str
+    base_url: str = Field(exclude=True)
 
     def get_url(self, thumbnail: bool = False) -> str:
         """Get the URL for the image, optionally as thumbnail"""
@@ -139,13 +143,13 @@ class GalleryImage(BaseModel):
 
             for item in items:
                 try:
-                    if not (isinstance(item, list) and len(item) > 1):
+                    if not isinstance(item, dict) or item.get("is_dir", True):
                         continue
 
-                    name = item[0]
-                    data = item[1][1]
+                    name = item["path"]
+                    data = item.get("object", {})
 
-                    if not (isinstance(data, dict) and "created_at" in data):
+                    if not data or "created_at" not in data:
                         continue
 
                     created_at = parse_date(data["created_at"])
@@ -153,9 +157,14 @@ class GalleryImage(BaseModel):
                         continue
 
                     images.append(
-                        cls(name=name, created_at=created_at, base_url=base_url)
+                        cls(
+                            name=name,
+                            created_at=created_at,
+                            cid=item["cid"],
+                            base_url=base_url
+                        )
                     )
-                except (IndexError, KeyError, ValueError):
+                except (KeyError, ValueError):
                     continue
 
             return sorted(images, key=lambda x: x.created_at, reverse=True)
@@ -169,35 +178,33 @@ class GalleryImage(BaseModel):
 
             items = response.json()
             image_item = next(
-                (
-                    item
-                    for item in items
-                    if isinstance(item, list) and len(item) > 0 and item[0] == name
-                ),
+                (item for item in items if not item.get("is_dir") and item["path"] == name),
                 None,
             )
 
-            if not image_item or not (
-                len(image_item) > 1
-                and isinstance(image_item[1], list)
-                and len(image_item[1]) > 1
-                and image_item[1][1]
-                and isinstance(image_item[1][1], dict)
-                and "created_at" in image_item[1][1]
-            ):
+            if not image_item or not image_item.get("object"):
                 return None
 
-            data = image_item[1][1]
+            data = image_item["object"]
+            if "created_at" not in data:
+                return None
+
             created_at = parse_date(data["created_at"])
             if created_at is None:
                 return None
 
-            return cls(name=name, created_at=created_at, base_url=base_url)
+            return cls(
+                name=name,
+                created_at=created_at,
+                cid=image_item["cid"],
+                base_url=base_url
+            )
 
 
 class AudioTrack(BaseModel):
     name: str
     created_at: datetime
+    cid: str
     base_url: str = Field(exclude=True)
 
     def get_url(self) -> str:
@@ -217,13 +224,13 @@ class AudioTrack(BaseModel):
 
             for item in items:
                 try:
-                    if not (isinstance(item, list) and len(item) > 1):
+                    if not isinstance(item, dict) or item.get("is_dir", True):
                         continue
 
-                    name = item[0]
-                    data = item[1][1]
+                    name = item["path"]
+                    data = item.get("object", {})
 
-                    if not (isinstance(data, dict) and "created_at" in data):
+                    if not data or "created_at" not in data:
                         continue
 
                     created_at = parse_date(data["created_at"])
@@ -231,9 +238,14 @@ class AudioTrack(BaseModel):
                         continue
 
                     tracks.append(
-                        cls(name=name, created_at=created_at, base_url=base_url)
+                        cls(
+                            name=name,
+                            created_at=created_at,
+                            cid=item["cid"],
+                            base_url=base_url
+                        )
                     )
-                except (IndexError, KeyError, ValueError):
+                except (KeyError, ValueError):
                     continue
 
             return sorted(tracks, key=lambda x: x.created_at, reverse=True)
@@ -247,27 +259,24 @@ class AudioTrack(BaseModel):
 
             items = response.json()
             track_item = next(
-                (
-                    item
-                    for item in items
-                    if isinstance(item, list) and len(item) > 0 and item[0] == name
-                ),
+                (item for item in items if not item.get("is_dir") and item["path"] == name),
                 None,
             )
 
-            if not track_item or not (
-                len(track_item) > 1
-                and isinstance(track_item[1], list)
-                and len(track_item[1]) > 1
-                and track_item[1][1]
-                and isinstance(track_item[1][1], dict)
-                and "created_at" in track_item[1][1]
-            ):
+            if not track_item or not track_item.get("object"):
                 return None
 
-            data = track_item[1][1]
+            data = track_item["object"]
+            if "created_at" not in data:
+                return None
+
             created_at = parse_date(data["created_at"])
             if created_at is None:
                 return None
 
-            return cls(name=name, created_at=created_at, base_url=base_url)
+            return cls(
+                name=name,
+                created_at=created_at,
+                cid=track_item["cid"],
+                base_url=base_url
+            )
