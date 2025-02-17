@@ -8,6 +8,7 @@ Check out the [live site](https://krondor.org) to see it in action.
 ## requirements
 
 - python 3.12
+- tailwindcss@3 (install with `npm install -g tailwindcss@3`)
 - virtualenv
 - ruby and kamal (for deployments)
 
