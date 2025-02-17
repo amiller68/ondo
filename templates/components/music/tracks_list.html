@@ -3,9 +3,16 @@
         <div class="bg-white rounded-lg border-2 border-black shadow-xl p-6">
             <h2 class="font-vt323 text-2xl mb-2">{{ track.name }}</h2>
             <p class="text-sm text-gray-500">{{ track.created_at.strftime('%Y-%m-%d') }}</p>
-            <audio controls class="w-full mt-4">
+            <audio controls preload="metadata" class="w-full mt-4">
+                <source src="{{ track.get_url() }}" type="audio/x-m4a">
+                <source src="{{ track.get_url() }}" type="audio/aac">
+                <source src="{{ track.get_url() }}" type="audio/mp4">
                 <source src="{{ track.get_url() }}" type="audio/mpeg">
-                Your browser does not support the audio element.
+                <source src="{{ track.get_url() }}" type="audio/mp3">
+                <p class="text-sm text-red-500 mt-2">
+                    Your browser does not support the audio element. 
+                    <a href="{{ track.get_url() }}" class="underline">Download the audio file</a>
+                </p>
             </audio>
         </div>
     {% endfor %}
