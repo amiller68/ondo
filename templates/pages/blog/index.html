@@ -6,12 +6,42 @@
             </h1>
         </div>
         
-        <div id="blog-posts"
-             hx-get="/blog/api/posts"
-             hx-trigger="load">
-            <div class="flex justify-center items-center py-12">
-                <div id="spinner" class="htmx-indicator">
-                    <div class="spinner"></div>
+        <div class="mb-12 text-center">
+            {% set current_category = request.query_params.get('category', 'thoughts') %}
+            <a href="/blog?category=thoughts" 
+               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
+                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'thoughts' else '' }}"
+               hx-get="/blog?category=thoughts"
+               hx-target="main"
+               hx-push-url="true">
+                thoughts
+            </a>
+            <a href="/blog?category=creative"
+               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
+                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'creative' else '' }}"
+               hx-get="/blog?category=creative"
+               hx-target="main"
+               hx-push-url="true">
+                creative
+            </a>
+            <a href="/blog?category=changelog"
+               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
+                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'changelog' else '' }}"
+               hx-get="/blog?category=changelog"
+               hx-target="main"
+               hx-push-url="true">
+                changelog
+            </a>
+        </div>
+        
+        <div id="blog-posts">
+            <div id="blog-posts-content"
+                 hx-get="/blog/api/posts?category={{ current_category }}"
+                 hx-trigger="load">
+                <div class="flex justify-center items-center py-12">
+                    <div id="spinner" class="htmx-indicator">
+                        <div class="spinner"></div>
+                    </div>
                 </div>
             </div>
         </div>

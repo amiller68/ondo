@@ -9,7 +9,7 @@
         </a>
     </div>
     <div class="max-w-3xl mx-auto px-4 py-4"
-         hx-get="/gallery/api/items/{{ name }}"
+         hx-get="/gallery/api/items/{{ category }}/{{ name }}"
          hx-trigger="load"
          hx-swap="innerHTML"
          hx-on::after-request="

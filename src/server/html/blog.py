@@ -10,25 +10,42 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/blog", response_class=HTMLResponse)
-async def blog_index_page(request: Request, base_url: str = Depends(leaky_url)):
+async def blog_index_page(
+    request: Request, 
+    category: str = "thoughts",
+    base_url: str = Depends(leaky_url)
+):
     if request.headers.get("HX-Request"):
-        return templates.TemplateResponse("pages/blog/index.html", {"request": request})
+        return templates.TemplateResponse(
+            "pages/blog/index.html", 
+            {"request": request, "category": category}
+        )
     return templates.TemplateResponse(
-        "index.html", {"request": request, "page_content": "pages/blog/index.html"}
+        "index.html", 
+        {
+            "request": request, 
+            "page_content": "pages/blog/index.html",
+            "category": category
+        }
     )
 
 
 @router.get("/blog/api/posts", response_class=HTMLResponse)
-async def blog_index_posts(request: Request, base_url: str = Depends(leaky_url)):
-    posts = await BlogPost.read_all(base_url)
+async def blog_index_posts(
+    request: Request, 
+    category: str = "thoughts",
+    base_url: str = Depends(leaky_url)
+):
+    posts = await BlogPost.read_all(base_url, category=category)
     return templates.TemplateResponse(
-        "components/blog/blog_posts_list.html", {"request": request, "posts": posts}
+        "components/blog/blog_posts_list.html", 
+        {"request": request, "posts": posts}
     )
 
 
-@router.get("/blog/{name}", response_class=HTMLResponse)
-async def blog_post_page(request: Request, name: str):
-    context = {"request": request, "name": name}
+@router.get("/blog/{category}/{name}", response_class=HTMLResponse)
+async def blog_post_page(request: Request, category: str, name: str):
+    context = {"request": request, "category": category, "name": name}
 
     if request.headers.get("HX-Request"):
         return templates.TemplateResponse("pages/blog/post.html", context)
@@ -37,15 +54,21 @@ async def blog_post_page(request: Request, name: str):
     )
 
 
-@router.get("/blog/api/posts/{name}", response_class=HTMLResponse)
-async def blog_post(request: Request, name: str, base_url: str = Depends(leaky_url)):
-    post = await BlogPost.read_one(base_url=base_url, name=name)
+@router.get("/blog/api/posts/{category}/{name}", response_class=HTMLResponse)
+async def blog_post(
+    request: Request, 
+    category: str,
+    name: str, 
+    base_url: str = Depends(leaky_url)
+):
+    post = await BlogPost.read_one(base_url=base_url, name=f"{category}/{name}")
 
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
     context = {
         "request": request,
+        "category": category,
         "name": name,
         "created_at": post.created_at,
         "title": post.title,

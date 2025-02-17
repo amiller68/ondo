@@ -1,6 +1,10 @@
 #!/bin/bash
 
-source venv/bin/activate
+# Check if tailwindcss is installed globally
+if ! command -v tailwindcss &> /dev/null; then
+    echo "Installing tailwindcss globally..."
+    npm install -g tailwindcss
+fi
 
 # Check if -w flag is set
 # If it is, start the watcher
@@ -9,9 +13,6 @@ if [ "$1" == "-w" ]; then
 else
 	npx tailwindcss -i styles/main.css -o static/css/main.css
 fi
-
-# Deactivate the virtual environment
-deactivate
 
 # Exit the script
 exit 0

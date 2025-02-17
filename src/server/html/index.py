@@ -6,12 +6,12 @@ from src.state import AppState
 from ..deps import state
 from . import gallery
 from . import blog
-from . import audio
+from . import music
 
 router = APIRouter()
 router.include_router(gallery.router)
 router.include_router(blog.router)
-router.include_router(audio.router)
+router.include_router(music.router)
 templates = Jinja2Templates(directory="templates")
 
 
