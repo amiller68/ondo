@@ -4,9 +4,11 @@ from pydantic import BaseModel
 import httpx
 from ..utils import parse_date
 
+
 class BlogPostMetadata(BaseModel):
     title: str
     description: str
+
 
 class BlogPost(BaseModel):
     name: str
@@ -17,13 +19,15 @@ class BlogPost(BaseModel):
     category: str = "thoughts"  # Default category
 
     @classmethod
-    async def read_all(cls, base_url: str, category: Optional[str] = None) -> List["BlogPost"]:
+    async def read_all(
+        cls, base_url: str, category: Optional[str] = None
+    ) -> List["BlogPost"]:
         async with httpx.AsyncClient() as client:
             # Get posts for specific category
             url = f"{base_url}/blog"
             if category:
                 url = f"{url}/{category}"
-            
+
             response = await client.get(url)
             if response.status_code != 200:
                 return []
@@ -36,7 +40,9 @@ class BlogPost(BaseModel):
                     if not isinstance(item, dict) or item.get("is_dir", True):
                         continue
 
-                    name = item["path"]  # This is just the filename now, not the full path
+                    name = item[
+                        "path"
+                    ]  # This is just the filename now, not the full path
                     data = item.get("object", {})
 
                     if not data or "properties" not in data or "created_at" not in data:
@@ -52,7 +58,8 @@ class BlogPost(BaseModel):
                             title=data["properties"]["title"],
                             description=data["properties"]["description"],
                             created_at=created_at,
-                            category=category or "thoughts",  # Use the provided category
+                            category=category
+                            or "thoughts",  # Use the provided category
                         )
                     )
                 except (KeyError, ValueError):
@@ -66,9 +73,9 @@ class BlogPost(BaseModel):
         parts = name.split("/")
         if len(parts) != 2:
             return None
-        
+
         category, post_name = parts
-        
+
         async with httpx.AsyncClient() as client:
             # Get metadata from category endpoint
             meta_response = await client.get(f"{base_url}/blog/{category}")
@@ -80,7 +87,8 @@ class BlogPost(BaseModel):
                 (
                     item
                     for item in items
-                    if not item.get("is_dir") and item["path"] == post_name  # Match just the filename
+                    if not item.get("is_dir")
+                    and item["path"] == post_name  # Match just the filename
                 ),
                 None,
             )
@@ -97,7 +105,9 @@ class BlogPost(BaseModel):
                 return None
 
             # Get content
-            content_response = await client.get(f"{base_url}/blog/{category}/{post_name}?html=true")
+            content_response = await client.get(
+                f"{base_url}/blog/{category}/{post_name}?html=true"
+            )
             if content_response.status_code != 200:
                 return None
 
@@ -108,4 +118,4 @@ class BlogPost(BaseModel):
                 created_at=created_at,
                 content=content_response.text,
                 category=category,
-            ) 
+            )

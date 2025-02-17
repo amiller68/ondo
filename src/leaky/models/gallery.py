@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 import httpx
 from ..utils import parse_date
 
+
 class GalleryImage(BaseModel):
     name: str
     created_at: datetime
@@ -42,7 +43,7 @@ class GalleryImage(BaseModel):
                         continue
 
                     # Remove leading slashes from name
-                    clean_name = name.lstrip('/')
+                    clean_name = name.lstrip("/")
 
                     images.append(
                         cls(
@@ -58,7 +59,9 @@ class GalleryImage(BaseModel):
             return sorted(images, key=lambda x: x.created_at, reverse=True)
 
     @classmethod
-    async def read_one(cls, base_url: str, category: str, name: str) -> Optional["GalleryImage"]:
+    async def read_one(
+        cls, base_url: str, category: str, name: str
+    ) -> Optional["GalleryImage"]:
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{base_url}/gallery/{category}")
             if response.status_code != 200:
@@ -86,8 +89,6 @@ class GalleryImage(BaseModel):
             created_at = parse_date(data["created_at"])
             if created_at is None:
                 return None
-
-            
 
             return cls(
                 name=f"{category}/{name}",

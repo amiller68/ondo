@@ -11,35 +11,29 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/blog", response_class=HTMLResponse)
 async def blog_index_page(
-    request: Request, 
-    category: str = "thoughts",
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str = "thoughts", base_url: str = Depends(leaky_url)
 ):
     if request.headers.get("HX-Request"):
         return templates.TemplateResponse(
-            "pages/blog/index.html", 
-            {"request": request, "category": category}
+            "pages/blog/index.html", {"request": request, "category": category}
         )
     return templates.TemplateResponse(
-        "index.html", 
+        "index.html",
         {
-            "request": request, 
+            "request": request,
             "page_content": "pages/blog/index.html",
-            "category": category
-        }
+            "category": category,
+        },
     )
 
 
 @router.get("/blog/api/posts", response_class=HTMLResponse)
 async def blog_index_posts(
-    request: Request, 
-    category: str = "thoughts",
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str = "thoughts", base_url: str = Depends(leaky_url)
 ):
     posts = await BlogPost.read_all(base_url, category=category)
     return templates.TemplateResponse(
-        "components/blog/blog_posts_list.html", 
-        {"request": request, "posts": posts}
+        "components/blog/blog_posts_list.html", {"request": request, "posts": posts}
     )
 
 
@@ -56,10 +50,7 @@ async def blog_post_page(request: Request, category: str, name: str):
 
 @router.get("/blog/api/posts/{category}/{name}", response_class=HTMLResponse)
 async def blog_post(
-    request: Request, 
-    category: str,
-    name: str, 
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str, name: str, base_url: str = Depends(leaky_url)
 ):
     post = await BlogPost.read_one(base_url=base_url, name=f"{category}/{name}")
 

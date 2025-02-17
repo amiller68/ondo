@@ -35,10 +35,7 @@ async def gallery_items(request: Request, base_url: str = Depends(leaky_url)):
 
 @router.get("/gallery/{category}/{name}", response_class=HTMLResponse)
 async def gallery_item_page(
-    request: Request, 
-    category: str,
-    name: str, 
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str, name: str, base_url: str = Depends(leaky_url)
 ):
     context = {
         "request": request,
@@ -54,16 +51,12 @@ async def gallery_item_page(
 
 @router.get("/gallery/api/items/{category}/{name}", response_class=HTMLResponse)
 async def gallery_item(
-    request: Request, 
-    category: str,
-    name: str, 
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str, name: str, base_url: str = Depends(leaky_url)
 ):
     image = await GalleryImage.read_one(base_url, category, name)
 
     if image is None:
         raise HTTPException(status_code=404, detail="Image not found")
-
 
     context = {
         "request": request,

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import httpx
 from ..utils import parse_date
 
+
 class ListeningEntry(BaseModel):
     name: str
     title: str
@@ -82,7 +83,9 @@ class ListeningEntry(BaseModel):
                 return None
 
             # Get content
-            content_response = await client.get(f"{base_url}/music/listening/{name}?html=true")
+            content_response = await client.get(
+                f"{base_url}/music/listening/{name}?html=true"
+            )
             if content_response.status_code != 200:
                 return None
 
@@ -94,4 +97,4 @@ class ListeningEntry(BaseModel):
                 tags=data["properties"].get("tags", []),
                 created_at=created_at,
                 content=content_response.text,
-            ) 
+            )

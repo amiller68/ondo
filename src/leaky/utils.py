@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, Any
 
+
 def parse_date(date_value: Any) -> Optional[datetime]:
     if isinstance(date_value, list) and len(date_value) >= 9:
         try:
@@ -11,4 +12,4 @@ def parse_date(date_value: Any) -> Optional[datetime]:
             )
         except (ValueError, IndexError):
             return None
-    return None 
+    return None

@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 import httpx
 from ..utils import parse_date
 
+
 class AudioTrack(BaseModel):
     name: str
     created_at: datetime
@@ -81,4 +82,4 @@ class AudioTrack(BaseModel):
                 name=name,
                 created_at=created_at,
                 base_url=base_url,
-            ) 
+            )

@@ -12,42 +12,36 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/music", response_class=HTMLResponse)
 async def music_index_page(
-    request: Request, 
-    category: str = "me",
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str = "me", base_url: str = Depends(leaky_url)
 ):
     if request.headers.get("HX-Request"):
         return templates.TemplateResponse(
-            "pages/music/index.html", 
-            {"request": request, "category": category}
+            "pages/music/index.html", {"request": request, "category": category}
         )
     return templates.TemplateResponse(
-        "index.html", 
+        "index.html",
         {
-            "request": request, 
+            "request": request,
             "page_content": "pages/music/index.html",
-            "category": category
-        }
+            "category": category,
+        },
     )
 
 
 @router.get("/music/api/content", response_class=HTMLResponse)
 async def music_content(
-    request: Request, 
-    category: str = "me",
-    base_url: str = Depends(leaky_url)
+    request: Request, category: str = "me", base_url: str = Depends(leaky_url)
 ):
     if category == "me":
         tracks = await AudioTrack.read_all(base_url)
         return templates.TemplateResponse(
-            "components/music/tracks_list.html", 
-            {"request": request, "tracks": tracks}
+            "components/music/tracks_list.html", {"request": request, "tracks": tracks}
         )
     else:  # category == "listening"
         entries = await ListeningEntry.read_all(base_url)
         return templates.TemplateResponse(
-            "components/music/listening_list.html", 
-            {"request": request, "entries": entries}
+            "components/music/listening_list.html",
+            {"request": request, "entries": entries},
         )
 
 
@@ -62,7 +56,9 @@ async def listening_page(request: Request, name: str):
 
 
 @router.get("/music/api/listening/{name}", response_class=HTMLResponse)
-async def listening_entry(request: Request, name: str, base_url: str = Depends(leaky_url)):
+async def listening_entry(
+    request: Request, name: str, base_url: str = Depends(leaky_url)
+):
     entry = await ListeningEntry.read_one(base_url=base_url, name=name)
 
     if not entry:
@@ -72,4 +68,4 @@ async def listening_entry(request: Request, name: str, base_url: str = Depends(l
         "request": request,
         "entry": entry,
     }
-    return templates.TemplateResponse("components/music/listening_entry.html", context) 
+    return templates.TemplateResponse("components/music/listening_entry.html", context)
