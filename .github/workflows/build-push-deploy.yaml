@@ -26,8 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          gem install specific_install
-          gem specific_install https://github.com/basecamp/kamal.git 
+          gem install kamal --version 2.4.0
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:
