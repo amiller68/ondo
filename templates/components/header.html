@@ -2,7 +2,7 @@
 {% from "components/theme-switcher.html" import theme_switcher_compact %}
 
 {% macro header() %}
-<header class="w-full fixed top-0 z-10 px-4 py-4 bg-background">
+<header class="w-full fixed top-0 z-50 px-4 py-4 bg-background">
   {{ menu_modal() }}
 
   <div class="container mx-auto flex justify-between items-center h-[4rem] border-b border-border">
@@ -25,10 +25,19 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    // Global menu state management
+    window.menuState = window.menuState || {
+      escapeHandler: null,
+      outsideClickHandler: null
+    };
+    
+    function initializeMenu() {
       const menuDialog = document.getElementById('menu-dialog');
       const menuToggle = document.getElementById('menu-toggle');
       const menuClose = document.getElementById('menu-close');
+      
+      // Exit if elements don't exist
+      if (!menuDialog || !menuToggle || !menuClose) return;
       
       function toggleMenu(open = null) {
         const isOpen = open !== null ? open : !menuDialog.open;
@@ -43,7 +52,22 @@
         }
       }
 
-      // Add handler for menu links to close menu after navigation
+      // Remove old event listeners
+      if (window.menuState.escapeHandler) {
+        document.removeEventListener('keydown', window.menuState.escapeHandler);
+      }
+      if (window.menuState.outsideClickHandler) {
+        menuDialog.removeEventListener('click', window.menuState.outsideClickHandler);
+      }
+
+      // Remove old event listeners by cloning and replacing elements
+      const newMenuToggle = menuToggle.cloneNode(true);
+      menuToggle.parentNode.replaceChild(newMenuToggle, menuToggle);
+      
+      const newMenuClose = menuClose.cloneNode(true);
+      menuClose.parentNode.replaceChild(newMenuClose, menuClose);
+
+      // Close menu when a link is clicked
       menuDialog.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
           toggleMenu(false);
@@ -51,24 +75,52 @@
       });
 
       // Toggle menu when checkbox is clicked
-      menuToggle.addEventListener('click', () => toggleMenu());
+      newMenuToggle.addEventListener('click', () => toggleMenu());
 
       // Close menu when clicking X button
-      menuClose.addEventListener('click', () => toggleMenu(false));
+      newMenuClose.addEventListener('click', () => toggleMenu(false));
 
       // Close menu when clicking outside
-      menuDialog.addEventListener('click', function(event) {
+      window.menuState.outsideClickHandler = function(event) {
         if (event.target === menuDialog) {
           toggleMenu(false);
         }
-      });
+      };
+      menuDialog.addEventListener('click', window.menuState.outsideClickHandler);
 
       // Close menu when escape key is pressed
-      document.addEventListener('keydown', function(event) {
+      window.menuState.escapeHandler = function(event) {
         if (event.key === 'Escape' && menuDialog.open) {
           toggleMenu(false);
         }
-      });
+      };
+      document.addEventListener('keydown', window.menuState.escapeHandler);
+    }
+    
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeMenu);
+    } else {
+      initializeMenu();
+    }
+    
+    // Force close menu before HTMX navigation
+    document.addEventListener('htmx:beforeRequest', function(event) {
+      const menuDialog = document.getElementById('menu-dialog');
+      const menuToggle = document.getElementById('menu-toggle');
+      if (menuDialog && menuDialog.open) {
+        menuDialog.open = false;
+        menuToggle.checked = false;
+        document.body.classList.remove('body-no-scroll');
+      }
+    });
+    
+    // Re-initialize menu after HTMX swaps
+    document.addEventListener('htmx:afterSwap', function(event) {
+      // Always re-initialize after content swap
+      if (event.detail.target.id === 'content') {
+        setTimeout(initializeMenu, 0);
+      }
     });
   </script>
 </header>

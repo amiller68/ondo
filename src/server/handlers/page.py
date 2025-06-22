@@ -2,13 +2,13 @@ from datetime import datetime
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 templates = Jinja2Templates(directory="templates")
 
 
 class PageResponse:
-    """Helper for HTMX-aware page responses"""
+    """Helper for page responses with optional partial rendering"""
 
     def __init__(self, template: str, layout: str = "layouts/app.html"):
         self.template = template
@@ -29,5 +29,23 @@ class PageResponse:
         content_template = templates.get_template(self.template)
         content_html = content_template.render(template_data)
 
+        template_data["content"] = content_html
+        return templates.TemplateResponse(self.layout, template_data)
+
+    def render_with_content(
+        self, request: Request, content_html: str, data: Optional[Dict[str, Any]] = None
+    ) -> HTMLResponse:
+        """Render with pre-rendered content HTML"""
+        template_data = {
+            "request": request,
+            "current_year": datetime.now().year,
+            **(data or {}),
+        }
+
+        # HTMX navigation - return just the content
+        if request.headers.get("HX-Request"):
+            return HTMLResponse(content=content_html)
+
+        # Full page - wrap content in layout
         template_data["content"] = content_html
         return templates.TemplateResponse(self.layout, template_data)

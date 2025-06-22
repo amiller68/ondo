@@ -9,6 +9,7 @@
                     </td>
                     <td class="py-3 pr-4">
                         <a href="/blog/{{ post.category }}/{{ post.name }}" 
+                           hx-boost="false"
                            class="block group">
                             <div class="font-medium group-hover:text-primary transition-colors truncate">{{ post.title }}</div>
                             <div class="text-sm text-muted-foreground mt-0.5 line-clamp-2">{{ post.description }}</div>

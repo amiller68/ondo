@@ -1,19 +1,13 @@
 {% from "components/typing-header.html" import typing_header %}
 
-<main class="font-roboto-mono">
+<div class="font-roboto-mono">
     <div class="max-w-5xl mx-auto px-4 py-4">
         <div class="relative mb-16">
             {{ typing_header("> recordings", size="text-4xl") }}
         </div>
         
-        <div id="music-content"
-             hx-get="/music/api/content"
-             hx-trigger="load">
-            <div class="flex justify-center items-center py-12">
-                <div id="spinner" class="htmx-indicator">
-                    <div class="spinner"></div>
-                </div>
-            </div>
+        <div id="music-content">
+            {% include "components/music/tracks_table.html" %}
         </div>
     </div>
-</main> 
+</div> 

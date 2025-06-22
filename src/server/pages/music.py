@@ -3,21 +3,14 @@ from fastapi.responses import HTMLResponse
 
 from src.leaky.models.tracks import AudioTrack
 from ..deps import leaky_url
-from ..handlers import PageResponse, ComponentResponseHandler
+from ..handlers import isr_page
 
 router = APIRouter()
 
 
 @router.get("/music", response_class=HTMLResponse)
-async def music_index_page(request: Request):
-    """Music index page"""
-    page = PageResponse("pages/music/index.html", layout="layouts/app.html")
-    return page.render(request, {})
-
-
-@router.get("/music/api/content", response_class=HTMLResponse)
-async def music_content(request: Request, base_url: str = Depends(leaky_url)):
-    """API endpoint for music content component"""
+@isr_page(template="pages/music/index.html", ttl=3600)
+async def music_index_page(request: Request, base_url: str = Depends(leaky_url)):
+    """Music index page with server-side rendered tracks"""
     tracks = await AudioTrack.read_all(base_url)
-    handler = ComponentResponseHandler("components/music/tracks_table.html")
-    return await handler.respond(request, {"tracks": tracks})
+    return {"tracks": tracks}

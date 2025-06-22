@@ -1,8 +1,7 @@
 from fastapi import APIRouter
 
+from . import cache
+
 router = APIRouter(prefix="/v0")
 
-# Add API routes here as needed
-# Example:
-# from . import posts
-# router.include_router(posts.router)
+router.include_router(cache.router)

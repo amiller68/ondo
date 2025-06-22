@@ -137,22 +137,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             window.AppInit.run();
         });
-        
-        // Run initializers when content is loaded via HTMX
-        document.body.addEventListener('htmx:afterSwap', function(event) {
-            // Small delay to ensure DOM is ready
-            setTimeout(function() {
-                window.AppInit.run();
-            }, 10);
-        });
-        
-        // Also handle htmx:afterSettle for more complex scenarios
-        document.body.addEventListener('htmx:afterSettle', function(event) {
-            // Run any deferred initializations
-            if (window.AppInit.deferred) {
-                window.AppInit.deferred();
-            }
-        });
     </script>
 </body>
 </html>

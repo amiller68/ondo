@@ -1,21 +1,13 @@
 {% from "components/typing-header.html" import typing_header %}
 
-<main class="font-roboto-mono">
+<div class="font-roboto-mono">
     <div class="max-w-5xl mx-auto px-4 py-4">
         <div class="relative mb-16">
             {{ typing_header("> blog", size="text-4xl") }}
         </div>
         
         <div id="blog-posts">
-            <div id="blog-posts-content"
-                 hx-get="/blog/api/posts"
-                 hx-trigger="load">
-                <div class="flex justify-center items-center py-12">
-                    <div class="htmx-indicator">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-            </div>
+            {% include "components/blog/blog_posts_list.html" %}
         </div>
     </div>
-</main>
+</div>
