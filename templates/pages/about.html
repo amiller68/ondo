@@ -1,11 +1,10 @@
+{% from "components/typing-header.html" import typing_header %}
+{% from "components/social-links.html" import social_links %}
+
 <div class="flex flex-col items-center justify-center h-[80vh] w-full">
     <div class="max-w-[50ch] w-full px-4">
-        <h1 class="relative w-[max-content] font-mono text-2xl before:absolute before:inset-0 before:animate-typewriter before:bg-white after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-black">
-            > about
-        </h1>
-        <div
-            class="mt-8 text-md text-left"
-        >
+        {{ typing_header("> about") }}
+        <div class="mt-8 text-lg text-left">
             <p class="mb-4">
                 hey there, welcome! my name is alex.
             </p>
@@ -20,33 +19,7 @@
             </p>
         </div>
     </div>
-    <div
-        class="mt-8 flex justify-center text-2xl space-x-4 w-full"
-    >
-        <div class="hover:scale-110 transition-transform transform-gpu">
-            <a href="https://github.com/amiller68">
-                <i class="fab fa-github"></i>
-            </a>
-        </div>
-        <div class="hover:scale-110 transition-transform transform-gpu">
-            <a href="https://twitter.com/lord_krondor">
-                <i class="fab fa-twitter"></i>
-            </a>
-        </div>
-        <div class="hover:scale-110 transition-transform transform-gpu">
-            <a href="https://www.linkedin.com/in/alex-miller-110953171/">
-                <i class="fab fa-linkedin"></i>
-            </a>
-        </div>
-        <div class="hover:scale-110 transition-transform transform-gpu">
-            <a href="mailto:al@krondor.org">
-                <i class="far fa-envelope"></i>
-            </a>
-        </div>
-        <div class="hover:scale-110 transition-transform transform-gpu">
-            <a href="tg://resolve?domain=lord_krondor">
-                <i class="fab fa-telegram"></i>
-            </a>
-        </div>
+    <div class="mt-8 flex justify-center w-full">
+        {{ social_links(size="text-2xl") }}
     </div>
 </div>

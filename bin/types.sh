@@ -27,25 +27,19 @@ check_result() {
 # Ensure we're in the project root (adjust this path as needed)
 cd "$(dirname "$0")/.." || exit 1
 
-# Activate virtual environment
-print_header "Activating Virtual Environment"
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    # Windows
-    source venv/Scripts/activate
-else
-    # Unix/MacOS
-    source venv/bin/activate
+# Check if --strict flag is provided
+STRICT_MODE=false
+if [[ "$1" == "--strict" ]]; then
+    STRICT_MODE=true
 fi
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Failed to activate virtual environment${NC}"
-    exit 1
-fi
-
-# Type check with MyPy
+# Type check with MyPy using uvx
 print_header "Running MyPy Type Checker"
-# ignore venv folder
-mypy . --exclude venv
+if [ "$STRICT_MODE" = true ]; then
+    uvx mypy src --strict
+else
+    uvx mypy src
+fi
 check_result "MyPy"
 
 # Final summary

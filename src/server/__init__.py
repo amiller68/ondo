@@ -1,13 +1,19 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, APIRouter
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 from contextlib import asynccontextmanager
-from fastapi.templating import Jinja2Templates
+import asyncio
+from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
+from sse_starlette.sse import EventSourceResponse
+from watchfiles import awatch
 from src.state import AppState
-from .html import router as html_router
+from .pages import router as pages_router
+from .api import router as api_router
+from .health import router as health_router
 from .status import router as status_router
+from .handlers import PageResponse
 
 
 def create_app(state: AppState) -> FastAPI:
@@ -32,8 +38,6 @@ def create_app(state: AppState) -> FastAPI:
 
     app = FastAPI(lifespan=lifespan)
 
-    templates = Jinja2Templates(directory="templates")
-
     # Add exception handlers
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
@@ -47,11 +51,8 @@ def create_app(state: AppState) -> FastAPI:
         # For HTML requests, render the 404 page
         if exc.status_code == 404:
             print("404")
-            return templates.TemplateResponse(
-                "index.html",
-                {"request": request, "page_content": "pages/404.html"},
-                status_code=404,
-            )
+            page = PageResponse("pages/404.html", layout="layouts/app.html")
+            return page.render(request, {})
 
         # For other errors, still return JSON
         return JSONResponse(
@@ -63,40 +64,43 @@ def create_app(state: AppState) -> FastAPI:
     app.middleware("http")(state_middleware)
     app.middleware("http")(span_middleware)
 
-    # TODO: hot reloading
-    # if state.config.dev_mode:
-    #     dev_router = APIRouter()
-    #     @dev_router.get("/dev/reload")
-    #     async def reload_html():
+    # Hot reloading for development
+    if state.config.dev_mode:
+        dev_router = APIRouter()
 
-    #         async def event_generator():
-    #             template_dir = Path("templates")
-    #             try:
-    #                 watcher = awatch(template_dir)
-    #                 async for changes in watcher:
-    #                     if changes:
-    #                         yield {
-    #                             "event": "reload",
-    #                             "data": "reload"
-    #                         }
-    #             except asyncio.CancelledError:
-    #                 print("Generator cancelled")
-    #                 raise
-    #             finally:
-    #                 print("Generator cleanup")
+        @dev_router.get("/dev/hot-reload")
+        async def hot_reload():
+            async def event_generator():
+                template_dir = Path("templates")
+                styles_dir = Path("styles")
 
-    #         return EventSourceResponse(
-    #             event_generator(),
-    #             background=BackgroundTask(lambda: print("Connection closed")),
-    #         )
+                try:
+                    # Watch both templates and styles directories
+                    async for changes in awatch(template_dir, styles_dir):
+                        if changes:
+                            print(
+                                f"Hot reload: detected changes in {[str(c[1]) for c in changes]}"
+                            )
+                            yield {"event": "reload", "data": "reload"}
+                except asyncio.CancelledError:
+                    print("Hot reload watcher cancelled")
+                    raise
+                except Exception as e:
+                    print(f"Hot reload error: {e}")
+                finally:
+                    print("Hot reload cleanup")
 
-    #     app.include_router(dev_router)
+            return EventSourceResponse(event_generator())
+
+        app.include_router(dev_router)
 
     # Mount static files
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
-    # Include the HTML router
-    app.include_router(html_router)
+    # Include routers
+    app.include_router(pages_router)
+    app.include_router(api_router)
+    app.include_router(health_router)
     app.include_router(status_router, prefix="/_status")
 
     # and respond 200 to /up to please kamal

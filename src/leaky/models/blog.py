@@ -17,17 +17,15 @@ class BlogPost(BaseModel):
     created_at: datetime
     content: Optional[str] = None
     category: str = "thoughts"  # Default category
+    tags: List[str] = []  # Tags for the blog post
 
     @classmethod
     async def read_all(
         cls, base_url: str, category: Optional[str] = None
     ) -> List["BlogPost"]:
         async with httpx.AsyncClient() as client:
-            # Get posts for specific category
-            url = f"{base_url}/blog"
-            if category:
-                url = f"{url}/{category}"
-
+            # Use deep=true to fetch all posts in one request
+            url = f"{base_url}/blog?deep=true"
             response = await client.get(url)
             if response.status_code != 200:
                 return []
@@ -40,11 +38,20 @@ class BlogPost(BaseModel):
                     if not isinstance(item, dict) or item.get("is_dir", True):
                         continue
 
-                    name = item[
-                        "path"
-                    ]  # This is just the filename now, not the full path
-                    data = item.get("object", {})
+                    # Extract category and filename from path
+                    path = item.get("path", "")
+                    # Remove leading slash and split
+                    path_parts = path.lstrip("/").split("/")
+                    if len(path_parts) != 2:
+                        continue
 
+                    item_category, filename = path_parts
+
+                    # Filter by category if specified
+                    if category and item_category != category:
+                        continue
+
+                    data = item.get("object", {})
                     if not data or "properties" not in data or "created_at" not in data:
                         continue
 
@@ -54,12 +61,12 @@ class BlogPost(BaseModel):
 
                     posts.append(
                         cls(
-                            name=name,  # Just use the filename
+                            name=filename,
                             title=data["properties"]["title"],
                             description=data["properties"]["description"],
                             created_at=created_at,
-                            category=category
-                            or "thoughts",  # Use the provided category
+                            category=item_category,
+                            tags=data["properties"].get("tags", []),
                         )
                     )
                 except (KeyError, ValueError):
@@ -118,4 +125,5 @@ class BlogPost(BaseModel):
                 created_at=created_at,
                 content=content_response.text,
                 category=category,
+                tags=data["properties"].get("tags", []),
             )

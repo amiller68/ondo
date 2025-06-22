@@ -1,9 +1,9 @@
+{% from "components/typing-header.html" import typing_header %}
+
 <main class="font-roboto-mono">
-    <div class="max-w-3xl mx-auto px-4 py-4">
-        <div class="relative">
-            <h1 class="relative w-[max-content] text-4xl mb-16 before:absolute before:inset-0 before:w-full before:animate-typewriter before:bg-white after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-black">
-                > gallery
-            </h1>
+    <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="relative mb-16">
+            {{ typing_header("> gallery", size="text-4xl") }}
         </div>
 
         <div id="gallery-items"

@@ -37,27 +37,18 @@ check_result() {
 # Ensure we're in the project root (adjust this path as needed)
 cd "$(dirname "$0")/.." || exit 1
 
-# Activate virtual environment
-print_header "Activating Virtual Environment"
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    # Windows
-    source venv/Scripts/activate
-else
-    # Unix/MacOS
-    source venv/bin/activate
-fi
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Failed to activate virtual environment${NC}"
-    exit 1
-fi
-
-# Lint with Ruff
+# Lint with Ruff using uvx
 print_header "Running Ruff Linter"
+# Check which directories exist
+RUFF_PATHS="src"
+if [ -d "tests" ]; then
+    RUFF_PATHS="$RUFF_PATHS tests"
+fi
+
 if [ "$FIX" = true ]; then
-    ruff check --fix .
+    uvx ruff check $RUFF_PATHS --fix
 else
-    ruff check .
+    uvx ruff check $RUFF_PATHS
 fi
 check_result "Ruff"
 

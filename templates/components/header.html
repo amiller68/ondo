@@ -1,44 +1,18 @@
-<header>
-  <dialog id="menu-dialog">
-    <div class="menu">
-      <nav>
-          <ul>
-              <li><a href="/" 
-                     hx-get="/" 
-                     hx-target="#content"
-                     hx-push-url="true">home</a></li>
-              <li><a href="/about" 
-                     hx-get="/about" 
-                     hx-target="#content"
-                     hx-push-url="true">about</a></li>
-              <li><a href="/gallery" 
-                     hx-get="/gallery" 
-                     hx-target="#content"
-                     hx-push-url="true">gallery</a></li>
-              <li><a href="/blog" 
-                     hx-get="/blog" 
-                     hx-target="#content"
-                     hx-push-url="true">blog</a></li>
-              <li><a href="/music" 
-                     hx-get="/music" 
-                     hx-target="#content"
-                     hx-push-url="true">music</a></li>
-          </ul>
-      </nav>
-      <span id="menu-close">
-        <p>> X</p>
-      </span>
-    </div>
-  </dialog>
+{% from "components/menu-modal.html" import menu_modal %}
+{% from "components/theme-switcher.html" import theme_switcher_compact %}
 
-  <div class="container mx-auto flex justify-between items-center h-[4rem]">
+{% macro header() %}
+<header class="w-full fixed top-0 z-10 px-4 py-4 bg-background">
+  {{ menu_modal() }}
+
+  <div class="container mx-auto flex justify-between items-center h-[4rem] border-b border-border">
     <span id="banner">
-      <a href="/" 
-         hx-get="/" 
-         hx-target="#content"
-         hx-push-url="true">Krondor</a>
+      <a href="/" hx-get="/" hx-target="#content" hx-push-url="true">Krondor</a>
     </span>
-    <div class="flex items-center">
+    <div class="flex items-center gap-4">
+      <!-- Theme Switcher -->
+      {{ theme_switcher_compact() }}
+      
       <input type="checkbox" id="menu-toggle" class="hidden"/>
       <label for="menu-toggle" class="cursor-pointer p-4">
         <div id="menu-icon" class="w-8 h-6 relative">
@@ -98,3 +72,4 @@
     });
   </script>
 </header>
+{% endmacro %}

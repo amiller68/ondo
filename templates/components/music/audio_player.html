@@ -1,0 +1,208 @@
+<!-- Audio Player Component -->
+<div id="audio-player" class="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-border shadow-2xl transform translate-y-full transition-transform duration-300" style="z-index: 50;">
+    <div class="max-w-5xl mx-auto px-4 py-4">
+        <div class="flex items-center gap-4">
+            <!-- Play/Pause Button -->
+            <button id="main-play-btn" class="text-foreground hover:text-primary transition-colors">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                    <path id="main-play-icon" d="M8 5v14l11-7z"/>
+                    <path id="main-pause-icon" class="hidden" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                </svg>
+            </button>
+            
+            <!-- Track Info -->
+            <div class="flex-1 min-w-0">
+                <div class="font-medium truncate" id="track-name">No track selected</div>
+                <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span id="current-time">0:00</span>
+                    <div class="flex-1 relative h-1 bg-muted rounded-full overflow-hidden cursor-pointer" id="progress-bar">
+                        <div class="absolute h-full bg-primary transition-all duration-100" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            
+            <!-- Share Button -->
+            <button id="share-track" class="text-foreground hover:text-primary transition-colors" title="Copy link">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+            </button>
+            
+            <!-- Close Button -->
+            <button id="player-close" class="text-foreground hover:text-destructive transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden audio element -->
+<audio id="track-player" class="hidden"></audio>
+
+<script>
+    // Audio player functionality
+    window.AudioPlayer = {
+        player: null,
+        audioPlayer: null,
+        mainPlayBtn: null,
+        mainPlayIcon: null,
+        mainPauseIcon: null,
+        trackNameEl: null,
+        currentTimeEl: null,
+        durationEl: null,
+        progressBar: null,
+        progressFill: null,
+        playerClose: null,
+        shareBtn: null,
+        currentTrack: null,
+        onPlayCallback: null,
+        onPauseCallback: null,
+        
+        init: function() {
+            this.player = document.getElementById('track-player');
+            this.audioPlayer = document.getElementById('audio-player');
+            this.mainPlayBtn = document.getElementById('main-play-btn');
+            this.mainPlayIcon = document.getElementById('main-play-icon');
+            this.mainPauseIcon = document.getElementById('main-pause-icon');
+            this.trackNameEl = document.getElementById('track-name');
+            this.currentTimeEl = document.getElementById('current-time');
+            this.durationEl = document.getElementById('duration');
+            this.progressBar = document.getElementById('progress-bar');
+            this.progressFill = document.getElementById('progress-fill');
+            this.playerClose = document.getElementById('player-close');
+            this.shareBtn = document.getElementById('share-track');
+            
+            this.setupEventListeners();
+        },
+        
+        formatTime: function(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        },
+        
+        show: function() {
+            this.audioPlayer.classList.remove('translate-y-full');
+            document.body.style.paddingBottom = this.audioPlayer.offsetHeight + 'px';
+        },
+        
+        hide: function() {
+            this.audioPlayer.classList.add('translate-y-full');
+            document.body.style.paddingBottom = '0';
+            this.player.pause();
+            this.player.src = '';
+            this.currentTrack = null;
+            if (this.onPauseCallback) this.onPauseCallback();
+        },
+        
+        loadTrack: function(url, name) {
+            this.currentTrack = { url, name };
+            this.trackNameEl.textContent = name;
+            this.player.src = url;
+            this.show();
+        },
+        
+        play: function() {
+            if (this.player.src) {
+                this.player.play();
+            }
+        },
+        
+        pause: function() {
+            this.player.pause();
+        },
+        
+        togglePlayPause: function() {
+            if (this.player.paused) {
+                this.play();
+            } else {
+                this.pause();
+            }
+        },
+        
+        setupEventListeners: function() {
+            const self = this;
+            
+            // Main play/pause button
+            this.mainPlayBtn.addEventListener('click', function() {
+                self.togglePlayPause();
+            });
+            
+            // Progress bar click
+            this.progressBar.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                self.player.currentTime = percent * self.player.duration;
+            });
+            
+            // Close player
+            this.playerClose.addEventListener('click', function() {
+                self.hide();
+            });
+            
+            // Share button
+            this.shareBtn.addEventListener('click', function() {
+                if (self.currentTrack) {
+                    const shareUrl = new URL(window.location.origin + '/music');
+                    shareUrl.searchParams.set('track', encodeURIComponent(self.currentTrack.name));
+                    
+                    navigator.clipboard.writeText(shareUrl.toString()).then(function() {
+                        // Visual feedback
+                        const originalTitle = self.shareBtn.title;
+                        self.shareBtn.title = 'Link copied!';
+                        self.shareBtn.classList.add('text-primary');
+                        
+                        setTimeout(function() {
+                            self.shareBtn.title = originalTitle;
+                            self.shareBtn.classList.remove('text-primary');
+                        }, 2000);
+                    }).catch(function(err) {
+                        console.error('Failed to copy link:', err);
+                    });
+                }
+            });
+            
+            // Update UI on play/pause
+            this.player.addEventListener('play', function() {
+                self.mainPlayIcon.classList.add('hidden');
+                self.mainPauseIcon.classList.remove('hidden');
+                if (self.onPlayCallback) self.onPlayCallback();
+            });
+            
+            this.player.addEventListener('pause', function() {
+                self.mainPlayIcon.classList.remove('hidden');
+                self.mainPauseIcon.classList.add('hidden');
+                if (self.onPauseCallback) self.onPauseCallback();
+            });
+            
+            // Update progress
+            this.player.addEventListener('timeupdate', function() {
+                if (self.player.duration) {
+                    const percent = (self.player.currentTime / self.player.duration) * 100;
+                    self.progressFill.style.width = percent + '%';
+                    self.currentTimeEl.textContent = self.formatTime(self.player.currentTime);
+                }
+            });
+            
+            this.player.addEventListener('loadedmetadata', function() {
+                self.durationEl.textContent = self.formatTime(self.player.duration);
+            });
+            
+            // Track ended
+            this.player.addEventListener('ended', function() {
+                self.mainPlayIcon.classList.remove('hidden');
+                self.mainPauseIcon.classList.add('hidden');
+                if (self.onPauseCallback) self.onPauseCallback();
+            });
+        }
+    };
+    
+    // Initialize on DOM ready
+    window.AppInit = window.AppInit || { handlers: [], register: function(h) { this.handlers.push(h); }, run: function() { this.handlers.forEach(h => h()); } };
+    window.AppInit.register(function() {
+        window.AudioPlayer.init();
+    });
+</script>

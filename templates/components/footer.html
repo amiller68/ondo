@@ -1,0 +1,28 @@
+{% from "components/social-links.html" import social_links %}
+
+<footer class="mt-auto bg-muted/5 border-t border-border">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between">
+            <!-- About Section -->
+            <div>
+                <h3 class="text-lg font-semibold mb-4">About</h3>
+                <p class="text-muted-foreground">
+                    Welcome to my site, a space for my art, music, and ideas.
+                </p>
+            </div>
+            
+            <!-- Social -->
+            <div class="text-right">
+                <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                <div class="flex justify-end">
+                    {{ social_links(size="text-xl", spacing="space-x-3") }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div class="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+            <p>&copy; {{ current_year }} Krondor Corp. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

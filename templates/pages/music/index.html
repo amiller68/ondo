@@ -1,27 +1,13 @@
+{% from "components/typing-header.html" import typing_header %}
+
 <main class="font-roboto-mono">
-    <div class="max-w-3xl mx-auto px-4 py-4">
-        <div class="mb-12 text-center">
-            {% set current_category = request.query_params.get('category', 'me') %}
-            <a href="/music?category=me" 
-               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
-                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'me' else '' }}"
-               hx-get="/music?category=me"
-               hx-target="main"
-               hx-push-url="true">
-                my tracks
-            </a>
-            <a href="/music?category=listening"
-               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
-                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'listening' else '' }}"
-               hx-get="/music?category=listening"
-               hx-target="main"
-               hx-push-url="true">
-                listening to
-            </a>
+    <div class="max-w-5xl mx-auto px-4 py-4">
+        <div class="relative mb-16">
+            {{ typing_header("> recordings", size="text-4xl") }}
         </div>
         
         <div id="music-content"
-             hx-get="/music/api/content?category={{ current_category }}"
+             hx-get="/music/api/content"
              hx-trigger="load">
             <div class="flex justify-center items-center py-12">
                 <div id="spinner" class="htmx-indicator">

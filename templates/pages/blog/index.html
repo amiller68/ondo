@@ -1,45 +1,17 @@
+{% from "components/typing-header.html" import typing_header %}
+
 <main class="font-roboto-mono">
-    <div class="max-w-3xl mx-auto px-4 py-4">
-        <div class="relative">
-            <h1 class="relative w-[max-content] text-4xl mb-16 before:absolute before:inset-0 before:w-full before:animate-typewriter before:bg-white after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-black">
-                > blog
-            </h1>
-        </div>
-        
-        <div class="mb-12 text-center">
-            {% set current_category = request.query_params.get('category', 'thoughts') %}
-            <a href="/blog?category=thoughts" 
-               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
-                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'thoughts' else '' }}"
-               hx-get="/blog?category=thoughts"
-               hx-target="main"
-               hx-push-url="true">
-                thoughts
-            </a>
-            <a href="/blog?category=creative"
-               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
-                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'creative' else '' }}"
-               hx-get="/blog?category=creative"
-               hx-target="main"
-               hx-push-url="true">
-                creative
-            </a>
-            <a href="/blog?category=changelog"
-               class="inline-block py-1 px-6 rounded-full font-medium text-base hover:scale-110 transition-all duration-300 mx-8
-                      {{ 'bg-gray-100 border border-black shadow-md' if current_category == 'changelog' else '' }}"
-               hx-get="/blog?category=changelog"
-               hx-target="main"
-               hx-push-url="true">
-                changelog
-            </a>
+    <div class="max-w-5xl mx-auto px-4 py-4">
+        <div class="relative mb-16">
+            {{ typing_header("> blog", size="text-4xl") }}
         </div>
         
         <div id="blog-posts">
             <div id="blog-posts-content"
-                 hx-get="/blog/api/posts?category={{ current_category }}"
+                 hx-get="/blog/api/posts"
                  hx-trigger="load">
                 <div class="flex justify-center items-center py-12">
-                    <div id="spinner" class="htmx-indicator">
+                    <div class="htmx-indicator">
                         <div class="spinner"></div>
                     </div>
                 </div>

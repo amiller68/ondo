@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# Install virtualenv if not installed
-if ! [ -x "$(command -v virtualenv)" ]; then
-	echo 'Error: virtualenv is not installed.' >&2
+# Install uv if not installed
+if ! [ -x "$(command -v uv)" ]; then
+	echo 'Error: uv is not installed.' >&2
+	echo 'Install uv by running: curl -LsSf https://astral.sh/uv/install.sh | sh' >&2
 	exit 1
 fi
 
-virtualenv venv --python=python3.12
+# Create virtual environment and pin Python version
+uv venv
+uv python pin 3.12
 
-source venv/bin/activate
-pip install pip-tools
-pip-compile requirements.in -o requirements.txt
-pip install -r requirements.txt
-
-deactivate
+# Lock and sync dependencies including dev dependencies
+uv lock
+uv sync --dev
 
 exit 0

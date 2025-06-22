@@ -1,5 +1,5 @@
-# Use an official Python runtime as the base image
-FROM python:3.12-slim
+# Use the official uv Python runtime as the base image
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -7,10 +7,6 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    virtualenv \
-    python3-pip-whl \
-    python3-setuptools-whl \
-    python3-wheel-whl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the bin scripts
@@ -19,8 +15,8 @@ COPY bin/ ./bin/
 # Make sure the scripts are executable
 RUN chmod +x ./bin/*
 
-# Copy the requirements file into the container
-COPY requirements.in .
+# Copy the dependency files into the container
+COPY pyproject.toml .
 
 # Install the Python dependencies
 RUN /app/bin/install.sh
@@ -31,10 +27,15 @@ COPY src/ ./src/
 # Copy the static assets
 COPY static/ ./static/
 
+# Copy the styles (for potential Tailwind compilation)
+COPY styles/ ./styles/
+
+# Copy the Tailwind config
+COPY tailwind.config.js .
+
 # Copy the html templates
 COPY templates/ ./templates/
 
-# NOTE: you must set the DATABASE_PATH environment variable to the path to the database file
 # Create a startup script
 RUN echo '#!/bin/bash' > /app/start.sh && \
     echo '/app/bin/run.sh' >> /app/start.sh && \

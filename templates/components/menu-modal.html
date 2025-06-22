@@ -1,0 +1,29 @@
+{% macro menu_modal() %}
+<dialog id="menu-dialog" class="inset-0 h-screen w-screen text-lg py-4 px-6 bg-background/80 backdrop-blur-sm fixed" style="z-index: 999; touch-action: none;">
+  <div class="fixed inset-x-4 top-20 bg-card border-2 border-border rounded-xl shadow-2xl max-w-sm mx-auto font-vt323">
+    <div class="px-2 py-2 flex items-center justify-end">
+      <button id="menu-close" class="px-2 py-1 text-xl text-foreground hover:bg-destructive hover:text-white rounded-lg transition-colors">> X</button>
+    </div>
+    <nav class="p-6 pt-2">
+      <ul class="flex flex-col gap-3">
+        <li>
+          <a href="/blog" hx-get="/blog" hx-target="#content" hx-push-url="true" 
+             class="flex items-center justify-center px-4 py-3 rounded-lg text-foreground hover:bg-muted border-2 border-transparent hover:border-border transition-all duration-200 font-medium">blog</a>
+        </li>
+        <li>
+          <a href="/gallery" hx-get="/gallery" hx-target="#content" hx-push-url="true"
+             class="flex items-center justify-center px-4 py-3 rounded-lg text-foreground hover:bg-muted border-2 border-transparent hover:border-border transition-all duration-200 font-medium">gallery</a>
+        </li>
+        <li>
+          <a href="/music" hx-get="/music" hx-target="#content" hx-push-url="true"
+             class="flex items-center justify-center px-4 py-3 rounded-lg text-foreground hover:bg-muted border-2 border-transparent hover:border-border transition-all duration-200 font-medium">music</a>
+        </li>
+        <li>
+          <a href="/about" hx-get="/about" hx-target="#content" hx-push-url="true"
+             class="flex items-center justify-center px-4 py-3 rounded-lg text-foreground hover:bg-muted border-2 border-transparent hover:border-border transition-all duration-200 font-medium">about</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</dialog>
+{% endmacro %}

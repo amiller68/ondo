@@ -1,0 +1,30 @@
+{# Reusable social links component #}
+{% macro social_links(size="text-4xl", spacing="space-x-4") %}
+<div class="flex {{ spacing }}">
+  <div class="hover:scale-110 transition-transform transform-gpu">
+      <a href="https://github.com/amiller68" class="{{ size }}">
+          <i class="fab fa-github"></i>
+      </a>
+  </div>
+  <div class="hover:scale-110 transition-transform transform-gpu">
+      <a href="https://twitter.com/lord_krondor" class="{{ size }}">
+          <i class="fab fa-twitter"></i>
+      </a>
+  </div>
+  <div class="hover:scale-110 transition-transform transform-gpu">
+      <a href="https://www.linkedin.com/in/alex-miller-110953171/" class="{{ size }}">
+          <i class="fab fa-linkedin"></i>
+      </a>
+  </div>
+  <div class="hover:scale-110 transition-transform transform-gpu">
+      <a href="mailto:al@krondor.org" class="{{ size }}">
+          <i class="far fa-envelope"></i>
+      </a>
+  </div>
+  <div class="hover:scale-110 transition-transform transform-gpu">
+      <a href="tg://resolve?domain=lord_krondor" class="{{ size }}">
+          <i class="fab fa-telegram"></i>
+      </a>
+  </div>
+</div>
+{% endmacro %}

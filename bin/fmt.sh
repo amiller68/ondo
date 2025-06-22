@@ -27,24 +27,25 @@ check_result() {
 # Ensure we're in the project root (adjust this path as needed)
 cd "$(dirname "$0")/.." || exit 1
 
-# Activate virtual environment
-print_header "Activating Virtual Environment"
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    # Windows
-    source venv/Scripts/activate
-else
-    # Unix/MacOS
-    source venv/bin/activate
+# Check if --check flag is provided
+CHECK_MODE=false
+if [[ "$1" == "--check" ]]; then
+    CHECK_MODE=true
 fi
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Failed to activate virtual environment${NC}"
-    exit 1
-fi
-
-# Format with Black
+# Format with Black using uvx
 print_header "Running Black Formatter"
-black .
+# Check which directories exist
+BLACK_PATHS="src"
+if [ -d "tests" ]; then
+    BLACK_PATHS="$BLACK_PATHS tests"
+fi
+
+if [ "$CHECK_MODE" = true ]; then
+    uvx black $BLACK_PATHS --line-length 88 --check
+else
+    uvx black $BLACK_PATHS --line-length 88
+fi
 check_result "Black"
 
 # Final summary

@@ -1,0 +1,6 @@
+{# Reusable typing header component #}
+{% macro typing_header(text, size="text-2xl") %}
+<h1 class="relative w-[max-content] font-mono {{ size }} before:absolute before:inset-0 before:animate-typewriter before:bg-background after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-foreground">
+    {{ text }}
+</h1>
+{% endmacro %}

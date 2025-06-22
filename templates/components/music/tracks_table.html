@@ -1,0 +1,173 @@
+<div class="mt-0 -mx-4 overflow-x-auto">
+    <table class="w-full table-fixed border-collapse">
+        <colgroup>
+            <col class="w-12">
+            <col class="w-auto">
+            <col class="w-32">
+        </colgroup>
+        <tbody>
+            {% for track in tracks %}
+                <tr class="group transition-colors duration-150 hover:bg-muted/20 cursor-pointer track-row"
+                    data-audio-url="{{ track.get_url() }}"
+                    data-track-name="{{ track.name }}">
+                    <td class="py-4 px-4 text-center">
+                        <button class="play-btn text-foreground hover:text-primary transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path class="play-icon" d="M8 5v14l11-7z"/>
+                                <path class="pause-icon hidden" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                            </svg>
+                        </button>
+                    </td>
+                    <td class="py-4 pr-4">
+                        <span class="font-medium">{{ track.name }}</span>
+                    </td>
+                    <td class="py-4 px-4 text-right text-sm text-muted-foreground">
+                        {{ track.created_at.strftime('%Y-%m-%d') }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Include Audio Player Component -->
+{% include 'components/music/audio_player.html' %}
+
+<script>
+    // Integrate tracks table with audio player
+    window.AppInit = window.AppInit || { handlers: [], register: function(h) { this.handlers.push(h); }, run: function() { this.handlers.forEach(h => h()); } };
+    
+    window.AppInit.register(function() {
+        if (!window.AudioPlayer) return;
+        
+        let currentRow = null;
+        let currentButton = null;
+        
+        // Function to find and load track by name
+        function loadTrackByName(trackName, autoplay = false) {
+            const rows = document.querySelectorAll('.track-row');
+            for (let row of rows) {
+                if (row.dataset.trackName === trackName) {
+                    const audioUrl = row.dataset.audioUrl;
+                    const button = row.querySelector('.play-btn');
+                    
+                    // Reset previous button
+                    if (currentButton) {
+                        currentButton.querySelector('.play-icon').classList.remove('hidden');
+                        currentButton.querySelector('.pause-icon').classList.add('hidden');
+                    }
+                    
+                    // Update current track
+                    currentRow = row;
+                    currentButton = button;
+                    
+                    // Load track
+                    window.AudioPlayer.loadTrack(audioUrl, trackName);
+                    
+                    // Autoplay if requested
+                    if (autoplay) {
+                        window.AudioPlayer.play();
+                    }
+                    
+                    // Scroll track into view
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Highlight the row briefly
+                    row.classList.add('bg-muted/40');
+                    setTimeout(() => row.classList.remove('bg-muted/40'), 1000);
+                    
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Set callbacks for play/pause events
+        window.AudioPlayer.onPlayCallback = function() {
+            if (currentButton) {
+                currentButton.querySelector('.play-icon').classList.add('hidden');
+                currentButton.querySelector('.pause-icon').classList.remove('hidden');
+            }
+        };
+        
+        window.AudioPlayer.onPauseCallback = function() {
+            if (currentButton) {
+                currentButton.querySelector('.play-icon').classList.remove('hidden');
+                currentButton.querySelector('.pause-icon').classList.add('hidden');
+            }
+        };
+        
+        // Track row clicks
+        document.querySelectorAll('.track-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't trigger if clicking within the player
+                if (e.target.closest('#audio-player')) return;
+                
+                const audioUrl = this.dataset.audioUrl;
+                const trackName = this.dataset.trackName;
+                const button = this.querySelector('.play-btn');
+                
+                // If clicking the same track, toggle play/pause
+                if (currentRow === this) {
+                    window.AudioPlayer.togglePlayPause();
+                } else {
+                    // Reset previous button
+                    if (currentButton) {
+                        currentButton.querySelector('.play-icon').classList.remove('hidden');
+                        currentButton.querySelector('.pause-icon').classList.add('hidden');
+                    }
+                    
+                    // Update current track
+                    currentRow = this;
+                    currentButton = button;
+                    
+                    // Load and play new track
+                    window.AudioPlayer.loadTrack(audioUrl, trackName);
+                    window.AudioPlayer.play();
+                }
+            });
+        });
+        
+        // Check URL parameters on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const trackParam = urlParams.get('track');
+        const autoplayParam = urlParams.get('play') === 'true';
+        
+        if (trackParam) {
+            // Decode the track name (in case it has special characters)
+            const trackName = decodeURIComponent(trackParam);
+            
+            // Small delay to ensure everything is loaded
+            setTimeout(() => {
+                if (loadTrackByName(trackName, autoplayParam)) {
+                    console.log(`Loaded track: ${trackName}${autoplayParam ? ' (autoplay)' : ''}`);
+                } else {
+                    console.warn(`Track not found: ${trackName}`);
+                }
+            }, 100);
+        }
+        
+        // Update URL when playing a track
+        const originalLoadTrack = window.AudioPlayer.loadTrack;
+        window.AudioPlayer.loadTrack = function(url, name) {
+            originalLoadTrack.call(this, url, name);
+            
+            // Update URL without reloading the page
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('track', encodeURIComponent(name));
+            window.history.replaceState({}, '', newUrl);
+        };
+        
+        // Clear URL when closing player
+        const originalHide = window.AudioPlayer.hide;
+        window.AudioPlayer.hide = function() {
+            originalHide.call(this);
+            
+            // Remove track parameter from URL
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('track');
+            newUrl.searchParams.delete('play');
+            window.history.replaceState({}, '', newUrl);
+        };
+    });
+</script>

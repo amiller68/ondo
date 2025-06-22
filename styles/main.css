@@ -2,6 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Light mode - Professional and clean */
+  :root {
+    --background: 0 0% 98%;         /* Soft off-white */
+    --foreground: 220 13% 18%;      /* Dark slate */
+    
+    --muted: 220 13% 95%;           /* Light muted background */
+    --muted-foreground: 220 9% 46%; /* Medium gray text */
+    
+    --card: 0 0% 100%;              /* Pure white cards */
+    --card-foreground: 220 13% 18%; /* Dark text on cards */
+    
+    --popover: 0 0% 100%;           /* White popovers */
+    --popover-foreground: 220 13% 18%; /* Dark text */
+    
+    --border: 220 13% 91%;          /* Subtle borders */
+    --input: 220 13% 91%;           /* Input borders */
+    
+    --primary: 262 83% 58%;         /* Purple accent */
+    --primary-foreground: 0 0% 98%; /* Light text on primary */
+    
+    --secondary: 220 13% 95%;       /* Light secondary */
+    --secondary-foreground: 220 9% 46%; /* Medium text */
+    
+    --accent: 198 93% 60%;          /* Cyan accent */
+    --accent-foreground: 0 0% 98%;  /* Light text on accent */
+    
+    --destructive: 0 84% 60%;       /* Red for errors */
+    --destructive-foreground: 0 0% 98%; /* Light text */
+    
+    --ring: 262 83% 58%;            /* Purple focus ring */
+    
+    --success: 142 76% 36%;         /* Green for success */
+    --success-foreground: 0 0% 98%; /* Light text */
+    
+    --warning: 38 92% 50%;          /* Orange for warnings */
+    --warning-foreground: 0 0% 98%; /* Light text */
+  }
+  
+  /* Dark mode - Sophisticated and easy on eyes */
+  .dark {
+    --background: 224 71% 4%;       /* Very dark blue-gray */
+    --foreground: 213 31% 91%;      /* Light blue-gray text */
+    
+    --muted: 223 47% 11%;           /* Dark muted background */
+    --muted-foreground: 215 20% 70%; /* Medium light text */
+    
+    --card: 224 71% 4%;             /* Same as background for cards */
+    --card-foreground: 213 31% 91%; /* Light text on cards */
+    
+    --popover: 224 71% 4%;          /* Dark popovers */
+    --popover-foreground: 213 31% 91%; /* Light text */
+    
+    --border: 216 34% 17%;          /* Subtle dark borders */
+    --input: 216 34% 17%;           /* Input borders */
+    
+    --primary: 263 70% 50%;         /* Softer purple in dark */
+    --primary-foreground: 210 40% 98%; /* Very light text */
+    
+    --secondary: 223 47% 11%;       /* Dark secondary */
+    --secondary-foreground: 215 20% 70%; /* Medium light text */
+    
+    --accent: 199 89% 48%;          /* Softer cyan in dark */
+    --accent-foreground: 210 40% 98%; /* Very light text */
+    
+    --destructive: 0 63% 31%;       /* Darker red */
+    --destructive-foreground: 210 40% 98%; /* Light text */
+    
+    --ring: 263 70% 50%;            /* Purple focus ring */
+    
+    --success: 142 76% 36%;         /* Green (same) */
+    --success-foreground: 210 40% 98%; /* Light text */
+    
+    --warning: 38 92% 50%;          /* Orange (same) */
+    --warning-foreground: 210 40% 98%; /* Light text */
+  }
+
+  html,
+  body {
+    @apply w-full h-full bg-background text-foreground overflow-x-hidden;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 @layer utilities {
   .font-roboto-mono {
     font-family: "Roboto Mono", monospace;
@@ -9,21 +94,48 @@
   .font-vt323 {
     font-family: "VT323", monospace;
   }
+  
+  /* Gradient text utility - GRAYSCALE TEST */
+  .gradient-text {
+    @apply bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent;
+  }
+  
+  .dark .gradient-text {
+    @apply from-foreground to-muted-foreground;
+  }
 }
 
-@layer base {
-  html,
-  body {
-    @apply w-full h-full bg-white text-black overflow-x-hidden;
-    touch-action: auto;
-    -webkit-overflow-scrolling: touch;
+@layer components {
+  /* Simple, reusable components */
+  .card {
+    @apply bg-card border border-border rounded-lg p-6;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-all;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input;
+  }
+  
+  .text-muted {
+    @apply text-muted-foreground;
   }
 }
 
 /* App Level Styles */
 
-header {
-  @apply flex flex-col font-vt323 w-full fixed top-0 z-10 px-4 py-4;
+header > div {
+  @apply font-vt323;
   #banner {
     @apply text-6xl;
     :hover {
@@ -39,40 +151,8 @@ label {
   }
 }
 
-dialog {
-  @apply inset-0 h-screen w-screen text-2xl py-4 px-6 bg-black bg-opacity-20 fixed;
-  z-index: 999;
-  touch-action: none;
-}
-
 .body-no-scroll {
   @apply overflow-hidden;
-}
-
-.menu {
-  left: 15%;
-  top: 15%;
-  @apply relative m-4 w-[70%] rounded-lg shadow-xl bg-white border-2 border-black;
-  
-  ul {
-    @apply flex flex-col gap-2 p-4 items-center;
-    
-    li {
-      @apply transition-transform duration-300;
-      
-      &:hover {
-        @apply scale-110;
-      }
-    }
-  }
-  
-  #menu-close {
-    @apply flex flex-col absolute top-2 right-2 cursor-pointer transition-transform duration-300;
-    
-    &:hover {
-      @apply scale-110;
-    }
-  }
 }
 
 /* Main Page Content */
@@ -85,7 +165,7 @@ main {
 
 /* menu icon */
 .hamburger-line {
-  @apply absolute w-full h-[2px] bg-black transition-all duration-300 transform;
+  @apply absolute w-full h-[2px] bg-foreground transition-all duration-300 transform;
 }
 
 #menu-icon {
@@ -134,4 +214,129 @@ main {
 /* Add this new spinner style */
 .spinner {
   @apply h-24 w-24 border-[8px] border-gray-200 border-t-gray-400 rounded-full animate-spin;
+}
+
+/* Blog post content styles */
+.prose-content {
+  /* Paragraph styles */
+  & > p {
+    @apply mb-4 text-base;
+  }
+  
+  /* Heading styles */
+  & > h2 {
+    @apply font-vt323 text-2xl mt-8 mb-4;
+  }
+  
+  & > h3 {
+    @apply font-vt323 text-xl mt-6 mb-3;
+  }
+  
+  /* Code block styles */
+  & > pre {
+    @apply bg-muted p-4 rounded-md overflow-x-auto my-4 text-sm font-roboto-mono;
+  }
+  
+  /* Inline code styles */
+  & > :not(pre) > code {
+    @apply bg-muted text-sm font-roboto-mono px-1 py-0.5 rounded;
+  }
+  
+  /* List styles */
+  & ul {
+    @apply list-disc pl-6 my-4 space-y-2;
+  }
+  
+  & li {
+    @apply text-base;
+    &::marker {
+      @apply text-muted-foreground;
+    }
+  }
+  
+  & li > p {
+    @apply my-0;
+  }
+  
+  /* Link styles - only for links inside paragraphs and lists */
+  & > p > a,
+  & li > a {
+    @apply text-primary font-medium underline decoration-2 underline-offset-2 decoration-primary/50 px-0.5 rounded cursor-pointer;
+    @apply hover:bg-primary/10 hover:text-primary hover:decoration-primary;
+    @apply transition-colors duration-200;
+  }
+  
+  /* Other elements */
+  & > sup {
+    @apply text-xs ml-0.5;
+  }
+  
+  & > hr {
+    @apply my-8 border-border;
+  }
+  
+  /* Footnote styles */
+  & > .footnote-definition {
+    @apply my-16 grid grid-cols-[2em_1fr] gap-2;
+    
+    & > p {
+      @apply m-0 col-start-2;
+    }
+    
+    & > .footnote-definition-label {
+      @apply col-start-1;
+    }
+  }
+}
+
+/* Blog table styles */
+@layer components {
+  /* Clean table layout for blog posts */
+  .blog-table {
+    @apply w-full;
+  }
+  
+  .blog-table tbody tr {
+    @apply transition-colors duration-150;
+  }
+  
+  .blog-table tbody tr:hover {
+    @apply bg-muted/30;
+  }
+  
+  /* Tag styles */
+  .tag-pill {
+    @apply inline-block px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground;
+  }
+  
+  .tag-pill:hover {
+    @apply bg-muted/80;
+  }
+  
+  /* Active tag in filter */
+  .tag-active {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  /* Marquee effect for overflowing titles */
+  .marquee-container {
+    @apply overflow-hidden whitespace-nowrap relative;
+  }
+  
+  .marquee-content {
+    @apply inline-block;
+  }
+  
+  .marquee-container:hover .marquee-content {
+    animation: marquee 8s linear infinite;
+  }
+  
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
 }

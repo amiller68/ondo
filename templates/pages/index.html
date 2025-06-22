@@ -1,35 +1,9 @@
+{% from "components/typing-header.html" import typing_header %}
+{% from "components/social-links.html" import social_links %}
+
 <div class="flex flex-col items-center justify-center h-[80vh] w-[80vw] mx-auto">
-  <h1 class="relative w-[max-content] font-mono text-2xl before:absolute before:inset-0 before:animate-typewriter before:bg-white after:absolute after:inset-0 after:w-[0.125em] after:animate-caret after:bg-black">
-    > it's nice to see u
-  </h1>
-<div
-  class="mt-8 flex text-4xl space-x-4"
->
-  <!-- TODO: icons -->
-  <div class="hover:scale-110 transition-transform transform-gpu">
-      <a href="https://github.com/amiller68">
-          <i class="fab fa-github"></i>
-      </a>
+  {{ typing_header("> it's nice to see u") }}
+  <div class="mt-8">
+    {{ social_links() }}
   </div>
-  <div class="hover:scale-110 transition-transform transform-gpu">
-      <a href="https://twitter.com/lord_krondor">
-          <i class="fab fa-twitter"></i>
-      </a>
-  </div>
-  <div class="hover:scale-110 transition-transform transform-gpu">
-      <a href="https://www.linkedin.com/in/alex-miller-110953171/">
-          <i class="fab fa-linkedin"></i>
-      </a>
-  </div>
-  <div class="hover:scale-110 transition-transform transform-gpu">
-      <a href="mailto:al@krondor.org">
-          <i class="far fa-envelope"></i>
-      </a>
-  </div>
-  <div class="hover:scale-110 transition-transform transform-gpu">
-      <a href="tg://resolve?domain=lord_krondor">
-          <i class="fab fa-telegram"></i>
-      </a>
-  </div>
-</div>
 </div>

@@ -1,17 +1,13 @@
 #!/bin/bash
 
-source venv/bin/activate
-
 export LISTEN_ADDRESS=0.0.0.0
 export LISTEN_PORT=80
 export LEAKY_URL=https://leaky.krondor.org
 
 export DEBUG=False
+export PYTHONPATH=/app:$PYTHONPATH
 
-python -m src
-
-# Deactivate the virtual environment
-deactivate
+uv run python -m src.__main__
 
 # Exit the script
 exit 0

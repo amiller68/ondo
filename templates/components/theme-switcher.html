@@ -1,0 +1,78 @@
+{# Theme switcher component #}
+{% macro theme_switcher_compact() %}
+<button id="theme-toggle-compact" class="uk-button uk-button-ghost uk-button-icon uk-button-small" aria-label="Toggle theme">
+  <span class="relative block w-5 h-5">
+    <!-- Sun icon (visible in light mode) -->
+    <svg class="js-sun-icon absolute inset-0 transition-all duration-300 w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+    </svg>
+    
+    <!-- Moon icon (visible in dark mode) -->
+    <svg class="js-moon-icon absolute inset-0 transition-all duration-300 opacity-0 w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+    </svg>
+  </span>
+</button>
+
+<style>
+  /* Light mode (default) */
+  .js-sun-icon {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  .js-moon-icon {
+    transform: scale(0) rotate(-90deg);
+    opacity: 0;
+  }
+  
+  /* Dark mode */
+  .dark .js-sun-icon {
+    transform: scale(0) rotate(90deg);
+    opacity: 0;
+  }
+  .dark .js-moon-icon {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Compact theme switcher functionality
+  (function() {
+    function initCompactThemeSwitcher() {
+      const themeToggleCompact = document.getElementById('theme-toggle-compact');
+      const htmlElement = document.documentElement;
+      
+      if (themeToggleCompact) {
+        themeToggleCompact.addEventListener('click', function() {
+          const isDark = htmlElement.classList.contains('dark');
+          const frankenData = JSON.parse(localStorage.getItem('__FRANKEN__') || '{}');
+          
+          if (isDark) {
+            htmlElement.classList.remove('dark');
+            frankenData.mode = 'light';
+            console.log('Switched to light mode');
+          } else {
+            htmlElement.classList.add('dark');
+            frankenData.mode = 'dark';
+            console.log('Switched to dark mode');
+          }
+          
+          localStorage.setItem('__FRANKEN__', JSON.stringify(frankenData));
+          console.log('HTML classes:', htmlElement.className);
+        });
+      }
+    }
+    
+    // Register with AppInit if available, otherwise run immediately when DOM is ready
+    if (window.AppInit && window.AppInit.register) {
+      window.AppInit.register(initCompactThemeSwitcher);
+    } else if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCompactThemeSwitcher);
+    } else {
+      initCompactThemeSwitcher();
+    }
+  })();
+</script>
+{% endmacro %}

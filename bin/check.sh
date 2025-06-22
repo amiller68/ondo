@@ -1,73 +1,32 @@
 #!/bin/bash
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Source utilities
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/utils.sh"
 
-# Error counter
-ERRORS=0
+# Ensure we're in the project root
+cd "$PROJECT_ROOT" || exit 1
 
-# Function to print section headers
-print_header() {
-    echo -e "\n${YELLOW}=== $1 ===${NC}"
-}
-
-# Function to check command result
-check_result() {
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓ $1 passed${NC}"
-    else
-        echo -e "${RED}✗ $1 failed${NC}"
-        ERRORS=$((ERRORS + 1))
-    fi
-}
-
-# Ensure we're in the project root (adjust this path as needed)
-cd "$(dirname "$0")/.." || exit 1
-
-# Activate virtual environment
-print_header "Activating Virtual Environment"
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    # Windows
-    source venv/Scripts/activate
-else
-    # Unix/MacOS
-    source venv/bin/activate
+# Check which directories exist
+CHECK_PATHS="src"
+if [ -d "tests" ]; then
+    CHECK_PATHS="$CHECK_PATHS tests"
 fi
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Failed to activate virtual environment${NC}"
-    exit 1
-fi
-
-# Format with Black
+# Format with Black using uvx
 print_header "Running Black Formatter"
-black . --check
+uvx black $CHECK_PATHS --line-length 88 --check
 check_result "Black"
 
-# Lint with Ruff
+# Lint with Ruff using uvx
 print_header "Running Ruff Linter"
-ruff check .
+uvx ruff check $CHECK_PATHS
 check_result "Ruff"
 
-# Type check with MyPy
+# Type check with MyPy using uvx
 print_header "Running MyPy Type Checker"
-mypy . --exclude venv
+uvx mypy src
 check_result "MyPy"
 
-# Run tests with pytest
-# print_header "Running Tests"
-# pytest -v
-# check_result "Pytest"
-
 # Final summary
-print_header "Summary"
-if [ $ERRORS -eq 0 ]; then
-    echo -e "${GREEN}All checks passed successfully!${NC}"
-    exit 0
-else
-    echo -e "${RED}${ERRORS} check(s) failed${NC}"
-    exit 1
-fi
+print_summary "All checks passed successfully!"

@@ -1,0 +1,40 @@
+[project]
+name = "ondo"
+version = "0.1.0"
+description = "Ondo - FastAPI-based web application"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "python-dotenv",
+    "pydantic",
+    "fastapi",
+    "starlette",
+    "uvicorn",
+    "jinja2",
+    "greenlet",
+    "tenacity",
+    "watchfiles",
+    "sse-starlette",
+    "httpx",
+]
+
+[dependency-groups]
+dev = [
+    "pytailwindcss",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.25.3",
+    "black",
+    "ruff",
+    "mypy",
+    "pre-commit",
+    "types-jinja2",
+]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = false
+check_untyped_defs = true
